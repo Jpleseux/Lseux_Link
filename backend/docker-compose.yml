@@ -1,0 +1,59 @@
+version: "3"
+networks:
+  backend:
+    driver: bridge
+services:
+  rabbitmq: # Serviço RabbitMQ
+    image: rabbitmq:3.9-management
+    container_name: portfolio-rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    volumes:
+      - ./rabbitmq/config:/etc/rabbitmq/conf.d
+    ports:
+      - "5672:5672" # Porta padrão para o RabbitMQ
+      - "15672:15672" # Porta para a interface web de gerenciamento do RabbitMQ
+    networks:
+      - backend
+  backend-db:
+    image: postgres:latest
+    container_name: portfolio-db
+    environment:
+      PGDATA: /tmp
+      POSTGRES_DB: portfolio
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5433:5432"
+    volumes:
+      - "./docker/data/db-backend:/var/lib/postgresql/data"
+    networks:
+      - backend
+  backend-redis:
+    image: redis:latest
+    container_name: portfolio-redis
+    ports:
+      - "6378:6379"
+    expose:
+      - 6379
+    depends_on:
+      - backend-db
+    networks:
+      - backend
+  backend:
+    build: .
+    container_name: portfolio-backend
+    ports:
+      - 3000:3000
+      - 4000:4000
+    volumes:
+      - .:/home/node/app
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1" # incluir (127.0.0.1 host.docker.internal) em /etc/hosts
+    depends_on:
+      - rabbitmq
+      - backend-db
+      - backend-redis
+    networks:
+      - backend
