@@ -17,7 +17,14 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "typeorm": "typeorm-ts-node-commonjs",
+    "typeorm-extension": "ts-node ./node_modules/typeorm-extension/bin/cli.cjs",
+    "migration:create": "npm run typeorm migration:create ./migration-create.migration",
+    "migration:run": "npm run typeorm migration:run -- -d src/@modules/shared/infra/database/datasource",
+    "db:create": "npm run typeorm-extension db:create -- -d src/@modules/shared/infra/database/datasource",
+    "db:drop": "npm run typeorm-extension db:drop -- -d src/@modules/shared/infra/database/datasource",
+    "seed:run": "npm run typeorm-extension seed:run -- -d src/@modules/shared/infra/database/datasource"
   },
   "dependencies": {
     "@golevelup/nestjs-rabbitmq": "^4.1.0",
