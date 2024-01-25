@@ -18,6 +18,9 @@ export class UserEntity {
   password(): string {
     return this.props.password;
   }
+  userName(): string {
+    return this.props.userName;
+  }
   isVerify(): boolean {
     return this.props.isVerify;
   }
