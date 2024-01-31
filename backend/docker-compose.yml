@@ -5,7 +5,7 @@ networks:
 services:
   rabbitmq: # Serviço RabbitMQ
     image: rabbitmq:3.9-management
-    container_name: portfolio-rabbitmq
+    container_name: LseuxLink-rabbitmq
     environment:
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=admin
@@ -18,10 +18,10 @@ services:
       - backend
   backend-db:
     image: postgres:latest
-    container_name: portfolio-db
+    container_name: LseuxLink-db
     environment:
       PGDATA: /tmp
-      POSTGRES_DB: portfolio
+      POSTGRES_DB: LseuxLink
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
     ports:
@@ -32,7 +32,7 @@ services:
       - backend
   backend-redis:
     image: redis:latest
-    container_name: portfolio-redis
+    container_name: LseuxLink-redis
     ports:
       - "6378:6379"
     expose:
@@ -43,7 +43,7 @@ services:
       - backend
   backend:
     build: .
-    container_name: portfolio-backend
+    container_name: LseuxLink-backend
     ports:
       - 3000:3000
       - 4000:4000

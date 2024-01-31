@@ -12,8 +12,8 @@ async function bootstrap() {
   app.use(json({ limit: "50mb" }));
   app.use(urlencoded({ extended: true, limit: "50mb" }));
   const swaggerConfig = new DocumentBuilder()
-    .setTitle("portfolio")
-    .setDescription("Documentação portfolio")
+    .setTitle("LseuxLink")
+    .setDescription("Documentação LseuxLink")
     .setVersion("1.0")
     .addTag("Auth")
     .addBearerAuth({ type: "http", scheme: "bearer", bearerFormat: "JWT", in: "header" }, "Authorization")
