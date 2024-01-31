@@ -19,6 +19,8 @@ export class UserModel {
   password: string;
   @Column()
   phone_number: string;
+  @Column()
+  avatar: string;
   @Column({ default: false })
   is_verify?: boolean;
 }

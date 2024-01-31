@@ -4,6 +4,7 @@ export type userProps = {
   password: string;
   userName: string;
   phone_number?: string;
+  avatar: string;
   isVerify?: boolean;
 };
 
@@ -11,6 +12,9 @@ export class UserEntity {
   constructor(readonly props: userProps) {}
   email(): string {
     return this.props.email;
+  }
+  avatar(): string {
+    return this.props.avatar;
   }
   uuid(): string {
     return this.props.uuid;

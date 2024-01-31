@@ -49,6 +49,11 @@ export class MigrationUser1706129063134 implements MigrationInterface {
             type: "boolean",
             default: false,
           },
+          {
+            name: "avatar",
+            type: "text",
+            isNullable: true,
+          },
         ],
       }),
     );

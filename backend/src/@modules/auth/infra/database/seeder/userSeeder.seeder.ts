@@ -14,6 +14,7 @@ export class UserSeeder implements Seeder {
         password: password,
         userName: "user1",
         phone_number: "89 999312231",
+        avatar: "tretetreret",
         is_verify: true,
       },
       {
@@ -22,6 +23,7 @@ export class UserSeeder implements Seeder {
         password: password,
         userName: "user2",
         phone_number: "99 999312231",
+        avatar: "qweweqweqweqw",
       },
     ];
     await repo.insert(users);
