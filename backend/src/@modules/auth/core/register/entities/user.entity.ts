@@ -4,7 +4,7 @@ export type userProps = {
   password: string;
   userName: string;
   phone_number?: string;
-  avatar: string;
+  avatar?: string;
   isVerify?: boolean;
 };
 
