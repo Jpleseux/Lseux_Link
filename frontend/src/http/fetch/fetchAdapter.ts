@@ -1,5 +1,5 @@
 import httpClient from "../httpClient";
-export const mainRoute = process.env.API_URL;
+export const mainRoute = "http://localhost:3000/";
 export default class fetchAdapter implements httpClient{
     async post(url: string, data: unknown): Promise<unknown> {
         const response = await fetch(mainRoute + url, {

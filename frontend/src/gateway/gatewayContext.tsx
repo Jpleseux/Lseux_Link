@@ -2,7 +2,7 @@ import { createContext, ReactNode } from 'react';
 import fetchAdapter from '../http/fetch/fetchAdapter';
 import { HttpUserGateway } from './http/auth/httpUserGateway.local';
 interface GatewayContextType {
-
+  userGateway: HttpUserGateway,
 }
 
 const GatewayContext = createContext<GatewayContextType | undefined>(undefined);

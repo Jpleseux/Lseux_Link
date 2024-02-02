@@ -5,7 +5,7 @@ import { userGateway } from "../../interfaces/auth/userGateway";
 export class HttpUserGateway implements userGateway {
     constructor(readonly httpClient: httpClient) {}
     async signUp(user: UserEntity): Promise<UserEntity> {
-        const response = await this.httpClient.post("auth/save/user", user);
+        const response = await this.httpClient.post("auth/save/user", user.props);
         return new UserEntity({
             avatar: response.avatar,
             email: response.email,

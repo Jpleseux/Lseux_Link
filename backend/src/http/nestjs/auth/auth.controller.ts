@@ -20,11 +20,17 @@ export class AuthController {
   })
   @Post("save/user")
   async saveUser(@Body() body: AuthRegisterUserRequestDto, @Res() response) {
-    const action = new saveUserUsecase(this.registerRepo, this.registerGateway);
-    const user = await action.execute(body);
-    response.status(HttpStatus.OK).send({
-      message: "Usuario salvo com sucesso",
-      user: user.props,
-    });
+    try {
+      const action = new saveUserUsecase(this.registerRepo, this.registerGateway);
+      const user = await action.execute(body);
+      response.status(HttpStatus.OK).send({
+        message: "Usuario salvo com sucesso",
+        user: user.props,
+      });
+    } catch (error) {
+      response.status(HttpStatus.OK).send({
+        message: "Erro ao salvar usuario" + error,
+      });
+    }
   }
 }
