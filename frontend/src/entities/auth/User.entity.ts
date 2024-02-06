@@ -2,7 +2,7 @@ export type userProps = {
     email: string;
     userName: string;
     phone_number?: string;
-    avatar: string;
+    avatar?: string;
   };
   
   export class UserEntity {
@@ -10,7 +10,7 @@ export type userProps = {
     email(): string {
       return this.props.email;
     }
-    avatar(): string {
+    avatar(): string | undefined{
       return this.props.avatar;
     }
     userName(): string {

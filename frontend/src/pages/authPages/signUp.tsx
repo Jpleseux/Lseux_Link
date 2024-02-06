@@ -1,14 +1,17 @@
-import React, { useContext, useState, ChangeEvent, FormEvent } from 'react';
+import React, { useContext, useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import '../../../public/style/auth/signUp.css';
 import Message from '../../components/visual/Message.component';
 import { GatewayContext } from '../../gateway/gatewayContext';
 import { UserEntity } from '../../entities/auth/User.entity';
-
+import Loader from '../../components/visual/Loader';
+import { useNavigate } from 'react-router';
 function SignUp() {
+  const navigate = useNavigate()
   const gatewayContext = useContext(GatewayContext);
   const userGateway = gatewayContext?.userGateway;
-  const [user, setUser] = useState<UserEntity>(new UserEntity({ email: '', userName: '', avatar: '' }));
-  const [msg, setMsg] = useState<string>();
+  const [user, setUser] = useState<UserEntity>(new UserEntity({ email: '', userName: '', avatar: '', phone_number: '' }));
+  const [msg, setMsg] = useState({msg:null, status: null});
+  const [loading, setLoading] = useState(false);
   async function handleOnChange(e: ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
     setUser((prevState) => {
@@ -16,19 +19,37 @@ function SignUp() {
       return newUser;
     });
   }
+  useEffect(() => {
+    if (loading) {
+      document.body.style.pointerEvents = 'none';
+    } else {
+      document.body.style.pointerEvents = 'auto';
+    }
+  }, [loading])
 
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setLoading(true);
+    setMsg({msg: null, status: null})
     const response = await userGateway?.signUp(user);
-    console.log(response);
+    setMsg({msg: response?.message, status: response?.status});
+    if (msg.status < 300) {
+      navigate("/", {replace: true});
+    } else if (msg.msg === "Esse email já existe mas não foi verificado ainda, verifique sua caixa de email ou peça reenvio do token") {
+      
+    }
+    setLoading(false);
   }
 
   return (
     <div className="signBody">
-      {msg && 
-        <Message msg={"OK"} status={404} timers={3000} />
+      {msg.msg && 
+        <Message msg={msg.msg} status={msg.status} timers={3000} />
       }
       <form className="form" onSubmit={submit}>
+        {loading && 
+                <Loader />
+        }
         <p className="title">Cadastre-se</p>
         <p className="message">Cadastre-se para ter acesso ao site.</p>
         <label>
@@ -37,7 +58,7 @@ function SignUp() {
             placeholder="Nome"
             type="text"
             className="input"
-            name="name"
+            name="userName"
           />
         </label>
         <label>
@@ -47,6 +68,15 @@ function SignUp() {
             type="email"
             className="input"
             name="email"
+          />
+        </label>
+        <label>
+          <input
+            onChange={handleOnChange}
+            placeholder="Numero de telefone"
+            type="text"
+            className="input"
+            name="phone_number"
           />
         </label>
         <label>

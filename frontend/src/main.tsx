@@ -5,6 +5,7 @@ import './index.css'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import SignUp from './pages/authPages/signUp.tsx'
 import { GatewayProvider } from './gateway/gatewayContext.tsx'
+import VerifyAccount from './pages/authPages/verifyAccount.tsx'
 const router = createBrowserRouter([
   {
     path:"/",
@@ -14,6 +15,10 @@ const router = createBrowserRouter([
         path: "/signup",
         element: <SignUp/>
       },
+      {
+        path: "verify/account/:token",
+        element: <VerifyAccount/>
+      }
     ]
   }
 ])

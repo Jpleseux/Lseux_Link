@@ -2,15 +2,18 @@
 import { saveUserUsecase } from "@modules/auth/core/register/usecases/saveUser.usecase";
 import { UserModel } from "@modules/auth/infra/database/models/UserModel.model";
 import { RegisterGatewayLocal } from "@modules/auth/infra/register/gateway/registerGateway.local";
+import { registerEmailQueueMemory } from "@modules/auth/infra/register/queue/registerEmailQueue.rabbitmq.memory";
 import { RegisterRepositoryTypeOrm } from "@modules/auth/infra/register/repository/registerRepository.typeorm";
 import dataSource from "@modules/shared/infra/database/datasource";
 let repo: RegisterRepositoryTypeOrm;
 let gateway: RegisterGatewayLocal;
+let queue: registerEmailQueueMemory;
 describe("Deve testar o saveUserUsecase", () => {
   beforeAll(async () => {
     await dataSource.initialize();
     repo = new RegisterRepositoryTypeOrm(dataSource);
     gateway = new RegisterGatewayLocal(dataSource);
+    queue = new registerEmailQueueMemory();
   });
 
   afterAll(async () => {
@@ -23,7 +26,7 @@ describe("Deve testar o saveUserUsecase", () => {
       userName: "user5",
       phone_number: "89 999312231",
     };
-    const action = new saveUserUsecase(repo, gateway);
+    const action = new saveUserUsecase(repo, gateway, queue);
     await action.execute(user);
     const userDb = await dataSource
       .getRepository(UserModel)
@@ -40,7 +43,7 @@ describe("Deve testar o saveUserUsecase", () => {
       userName: "user5",
       phone_number: "89 999312231",
     };
-    const action = new saveUserUsecase(repo, gateway);
+    const action = new saveUserUsecase(repo, gateway, queue);
     await expect(async () => {
       await action.execute(user);
     }).rejects.toThrow("Este email é inválido");
@@ -52,7 +55,7 @@ describe("Deve testar o saveUserUsecase", () => {
       userName: "user5",
       phone_number: "89 999312231",
     };
-    const action = new saveUserUsecase(repo, gateway);
+    const action = new saveUserUsecase(repo, gateway, queue);
     await expect(async () => {
       await action.execute(user);
     }).rejects.toThrow("Este usuario já existe");
@@ -64,7 +67,7 @@ describe("Deve testar o saveUserUsecase", () => {
       userName: "user5",
       phone_number: "89 999312231",
     };
-    const action = new saveUserUsecase(repo, gateway);
+    const action = new saveUserUsecase(repo, gateway, queue);
     await expect(async () => {
       await action.execute(user);
     }).rejects.toThrow("Esse email já existe mas não foi verificado ainda, verifique sua caixa de email ou peça reenvio do token");

@@ -3,6 +3,7 @@ import { RegisterRepositoryInterface } from "../registerRepository.interface";
 import { apiError } from "../../../../../http/nestjs/helpers/api-Error.helper";
 import { RegisterGatewayInterface } from "../registerGateway.interface";
 import { randomUUID } from "crypto";
+import { RegisterEmailQueueInterface } from "../registerEmailQueue.interface";
 
 export type userInput = {
   email: string;
@@ -15,6 +16,7 @@ export class saveUserUsecase {
   constructor(
     readonly repo: RegisterRepositoryInterface,
     readonly gateway: RegisterGatewayInterface,
+    readonly queue: RegisterEmailQueueInterface,
   ) {}
   public async execute(user: userInput): Promise<UserEntity> {
     const userDb = await this.repo.getUserByEMail(user.email);
@@ -37,6 +39,16 @@ export class saveUserUsecase {
       uuid: randomUUID(),
     });
     const output = await this.repo.saveUser(input);
+
+    const token = this.gateway.tokenGenerate(output);
+    const emailContent = {
+      from: process.env.EMAILADMIN,
+      to: user.email,
+      subject: "Verificação de conta",
+      text: "Clique no botão abaixo e será redirecionado para o site.",
+      html: `<a href='http://localhost:9000/#/verify-account/${user.email}/${token}'><button style='font-size: 16px; font-weight: 600; padding: 1vh 1vw; cursor: pointer;border-radius: 1vh; color: #fff; background-color: #303f9f; border: none;'>Clique aqui!</button></a>`,
+    };
+    await this.queue.sendEmail(emailContent);
     return output;
   }
 }
