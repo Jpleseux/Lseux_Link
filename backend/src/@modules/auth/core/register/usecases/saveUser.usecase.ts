@@ -40,13 +40,13 @@ export class saveUserUsecase {
     });
     const output = await this.repo.saveUser(input);
 
-    const token = this.gateway.tokenGenerate(output);
+    const token = await this.gateway.tokenGenerate(output);
     const emailContent = {
       from: process.env.EMAILADMIN,
       to: user.email,
       subject: "Verificação de conta",
       text: "Clique no botão abaixo e será redirecionado para o site.",
-      html: `<a href='http://localhost:9000/#/verify-account/${user.email}/${token}'><button style='font-size: 16px; font-weight: 600; padding: 1vh 1vw; cursor: pointer;border-radius: 1vh; color: #fff; background-color: #303f9f; border: none;'>Clique aqui!</button></a>`,
+      html: `<a href='http://localhost:5173/verify/account/${token}/${user.email}'><button style='font-size: 16px; font-weight: 600; padding: 1vh 1vw; cursor: pointer;border-radius: 1vh; color: #fff; background-color: #303f9f; border: none;'>Clique aqui!</button></a>`,
     };
     await this.queue.sendEmail(emailContent);
     return output;

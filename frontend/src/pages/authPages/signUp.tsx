@@ -33,7 +33,7 @@ function SignUp() {
     setMsg({msg: null, status: null})
     const response = await userGateway?.signUp(user);
     setMsg({msg: response?.message, status: response?.status});
-    if (msg.status < 300 && msg.msg !== "Esse email já existe mas não foi verificado ainda, verifique sua caixa de email ou peça reenvio do token") {
+    if (msg.status > 300 && msg.msg !== "Esse email já existe mas não foi verificado ainda, verifique sua caixa de email ou peça reenvio do token") {
       setTimeout(() => {
         navigate("/", {replace: true});
       }, 2000)
@@ -100,9 +100,11 @@ function SignUp() {
             name="confirmPassword"
           />
         </label>
+        <div className="buttons">
         <button type="submit" className="submit">
           Cadastrar
         </button>
+        </div>
         <p className="signin">
           Já tem uma conta ? <a href="#">Login</a>{' '}
         </p>
