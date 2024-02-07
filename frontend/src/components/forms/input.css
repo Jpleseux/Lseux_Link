@@ -22,13 +22,4 @@
     display: none;
 }
 @media (max-width: 760px) {
-    .input-container input:is([type="text"]){
-        font-size: 60%;
-        padding: .2rem;
-        padding-right: .8rem;
-    }
-    .input-container input:is([type="date"]){
-        width: 30%;
-        font-size: 60%;
-    }
 }

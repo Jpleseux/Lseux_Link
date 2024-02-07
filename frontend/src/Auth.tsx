@@ -1,6 +1,6 @@
 import { Outlet } from "react-router"
 
-function App() {
+function Auth() {
   return (
     <>
       <Outlet/>
@@ -8,4 +8,4 @@ function App() {
   )
 }
 
-export default App
+export default Auth;
