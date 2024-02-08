@@ -6,6 +6,10 @@ import { AuthRegisterUserResponse } from "./authRegister.response.dto";
 import { AuthRegisterUserRequestDto } from "./authRegister.request.dto";
 import { saveUserUsecase } from "@modules/auth/core/register/usecases/saveUser.usecase";
 import { RegisterEmailQueue } from "@modules/auth/infra/register/queue/registerEmailQueue.rabbitmq";
+import { AuthLoginRequestDto } from "./authLogin.request.dto";
+import { LoginUsecase } from "@modules/auth/core/login/usecases/login.usecase";
+import { LoginGatewayLocal } from "@modules/auth/infra/login/gateway/loginGatewayLocal.local";
+import { LoginRepositoryTypeorm } from "@modules/auth/infra/login/repository/loginRepositoryTypeOrm.orm";
 
 @ApiTags("Auth")
 @Controller("auth")
@@ -14,6 +18,8 @@ export class AuthController {
     readonly registerRepo: RegisterRepositoryTypeOrm,
     readonly registerGateway: RegisterGatewayLocal,
     readonly queue: RegisterEmailQueue,
+    readonly loginGateway: LoginGatewayLocal,
+    readonly loginRepo: LoginRepositoryTypeorm,
   ) {}
   @ApiOkResponse({
     description: "",
@@ -22,13 +28,12 @@ export class AuthController {
   })
   @Post("save/user")
   async saveUser(@Body() body: AuthRegisterUserRequestDto, @Res() response) {
-    console.log(body);
     try {
       const action = new saveUserUsecase(this.registerRepo, this.registerGateway, this.queue);
-      console.log(body);
       const user = await action.execute(body);
       response.status(HttpStatus.OK).send({
-        message: "Usuario salvo com sucesso",
+        message:
+          "Usuario salvo com sucesso, um email de verificação foi enviado a sua caixa de email, acesse o link para verificar.",
         user: user.props,
       });
     } catch (error) {
@@ -36,5 +41,14 @@ export class AuthController {
         message: error.message,
       });
     }
+  }
+  @Post("login")
+  async Login(@Body() body: AuthLoginRequestDto, @Res() response) {
+    const action = new LoginUsecase(this.loginGateway, this.loginRepo);
+    const token = await action.execute(body);
+    response.status(HttpStatus.OK).send({
+      message: "Login realizado com sucesso.",
+      token: token,
+    });
   }
 }

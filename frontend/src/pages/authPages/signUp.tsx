@@ -9,9 +9,14 @@ function SignUp() {
   const navigate = useNavigate()
   const gatewayContext = useContext(GatewayContext);
   const userGateway = gatewayContext?.userGateway;
-  const [user, setUser] = useState<UserEntity>(new UserEntity({ email: '', userName: '', avatar: '', phone_number: '' }));
+  const [user, setUser] = useState<UserEntity>(new UserEntity({ email: '', userName: '', avatar: '', phone_number: '', password: '' }));
   const [msg, setMsg] = useState({msg:null, status: null});
   const [loading, setLoading] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
+  async function handleConfirmPasswordChange(e: ChangeEvent<HTMLInputElement>) {
+    const { value } = e.target;
+    setConfirmPassword(value);
+  }
   async function handleOnChange(e: ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
     setUser((prevState) => {
@@ -30,17 +35,22 @@ function SignUp() {
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
-    setMsg({msg: null, status: null})
-    const response = await userGateway?.signUp(user);
-    setMsg({msg: response?.message, status: response?.status});
-    if (msg.status > 300 && msg.msg !== "Esse email já existe mas não foi verificado ainda, verifique sua caixa de email ou peça reenvio do token") {
-      setTimeout(() => {
-        navigate("/", {replace: true});
-      }, 2000)
-    } else if (msg.msg === "Esse email já existe mas não foi verificado ainda, verifique sua caixa de email ou peça reenvio do token") {
-      setTimeout(() => {
-        navigate(`/verify/account/token/${response?.user?.email()}`, {replace: true});
-      }, 2000)
+    setMsg({msg: null, status: null});
+    if (user.password() !== confirmPassword) {
+      setMsg({msg: "As senhas não são iguais", status: 400});
+    } else {
+      const response = await userGateway?.signUp(user);
+      setMsg({msg: response?.message, status: response?.status});
+      if (msg.status > 300 && msg.msg !== "Esse email já existe mas não foi verificado ainda, verifique sua caixa de email ou peça reenvio do token") {
+        setTimeout(() => {
+          navigate("/", {replace: true});
+        }, 2000)
+      } else if (msg.msg === "Esse email já existe mas não foi verificado ainda, verifique sua caixa de email ou peça reenvio do token") {
+        setTimeout(() => {
+          navigate(`/verify/account/token/${response?.user?.email()}`, {replace: true});
+        }, 2000)
+      }
+      setLoading(false);
     }
     setLoading(false);
   }
@@ -98,6 +108,7 @@ function SignUp() {
             type="password"
             className="input"
             name="confirmPassword"
+            onChange={handleConfirmPasswordChange}
           />
         </label>
         <div className="buttons">
@@ -106,7 +117,7 @@ function SignUp() {
         </button>
         </div>
         <p className="signin">
-          Já tem uma conta ? <a href="#">Login</a>{' '}
+          Já tem uma conta ? <a href="/">Login</a>{' '}
         </p>
       </form>
     </div>

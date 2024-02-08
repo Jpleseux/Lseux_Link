@@ -3,6 +3,7 @@ export type userProps = {
     userName: string;
     phone_number?: string;
     avatar?: string;
+    password: string;
   };
   
   export class UserEntity {
@@ -16,18 +17,17 @@ export type userProps = {
     userName(): string {
       return this.props.userName;
     }
+    password(): string {
+      return this.props.password;
+    }
     setUserName(userName: string) {
       this.props.userName = userName;
     }
+    setPassword(password: string) {
+      this.props.password = password;
+    }
     setEmail(email: string) {
       this.props.email = email;
-    }
-    payloadToken() {
-      const payload: any = {
-        name: this.props.userName,
-        email: this.props.email,
-      };
-      return payload;
     }
   }
   

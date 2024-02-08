@@ -2,10 +2,10 @@ import * as jwt from "jsonwebtoken";
 import * as bcryptjs from "bcryptjs";
 import { DataSource } from "typeorm";
 import { LoginGatewayInterface } from "../../../core/login/loginGateway.interface";
-import { UserEntity } from "@modules/auth/core/register/entities/user.entity";
 import { UserModel } from "../../database/models/UserModel.model";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import * as bcrypt from "bcrypt";
+import { UserEntity } from "@modules/auth/core/login/entities/user.entity";
 const segredo = "3cba50ad-324e-4f26-9bb9-3304bfc2c30e";
 
 export class LoginGatewayLocal implements LoginGatewayInterface {

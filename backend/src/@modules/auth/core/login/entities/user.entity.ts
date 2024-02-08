@@ -5,7 +5,7 @@ export type userProps = {
   userName: string;
   phone_number?: string;
   avatar?: string;
-  isVerify?: boolean;
+  is_verify?: boolean;
 };
 
 export class UserEntity {
@@ -25,8 +25,8 @@ export class UserEntity {
   userName(): string {
     return this.props.userName;
   }
-  isVerify(): boolean {
-    return this.props.isVerify;
+  is_verify(): boolean {
+    return this.props.is_verify;
   }
   phone_number(): string {
     return this.props.phone_number;
@@ -40,8 +40,8 @@ export class UserEntity {
   setPassword(Password: string) {
     this.props.password = Password;
   }
-  setIsVerify(isVerify: boolean) {
-    this.props.isVerify = isVerify;
+  setIs_verify(is_verify: boolean) {
+    this.props.is_verify = is_verify;
   }
   payloadToken() {
     const payload: any = {

@@ -14,7 +14,8 @@ export class LoginUsecase {
     const user = await this.repo.findByEmail(input.email);
     if (!user) {
       throw new apiError("Esse usuario não foi encontrado em nosso banco de dados", 404, "not_found");
-    } else if (user.isVerify() === false) {
+    } else if (user.is_verify() === false) {
+      console.log("OK");
       throw new apiError(
         "Esse email já existe mas não foi verificado ainda, verifique sua caixa de email ou peça reenvio do token",
         400,

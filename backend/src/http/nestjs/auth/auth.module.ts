@@ -8,6 +8,8 @@ import { RegisterEmailQueue } from "@modules/auth/infra/register/queue/registerE
 import * as amqplib from "amqplib";
 import { rejects } from "assert";
 import { ConsumeEmailService } from "./consumerEmailService.service";
+import { LoginRepositoryTypeorm } from "@modules/auth/infra/login/repository/loginRepositoryTypeOrm.orm";
+import { LoginGatewayLocal } from "@modules/auth/infra/login/gateway/loginGatewayLocal.local";
 @Module({
   controllers: [AuthController],
   providers: [
@@ -22,6 +24,20 @@ import { ConsumeEmailService } from "./consumerEmailService.service";
       provide: RegisterGatewayLocal,
       useFactory: (dataSource: DataSource) => {
         return new RegisterGatewayLocal(dataSource);
+      },
+      inject: [getDataSourceToken()],
+    },
+    {
+      provide: LoginGatewayLocal,
+      useFactory: (dataSource: DataSource) => {
+        return new LoginGatewayLocal(dataSource);
+      },
+      inject: [getDataSourceToken()],
+    },
+    {
+      provide: LoginRepositoryTypeorm,
+      useFactory: (dataSource: DataSource) => {
+        return new LoginRepositoryTypeorm(dataSource);
       },
       inject: [getDataSourceToken()],
     },
