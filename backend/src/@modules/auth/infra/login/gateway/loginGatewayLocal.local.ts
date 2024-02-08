@@ -30,7 +30,7 @@ export class LoginGatewayLocal implements LoginGatewayInterface {
       const payload = jwt.verify(token, segredo);
       return payload;
     } catch (error) {
-      throw new HttpException({ message: "Unauthorized" }, HttpStatus.UNAUTHORIZED);
+      throw new HttpException({ message: "Você não está autorizado" }, HttpStatus.UNAUTHORIZED);
     }
   }
   async encryptPassword(password: string): Promise<string> {

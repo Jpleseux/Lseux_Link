@@ -40,4 +40,16 @@ export class RegisterRepositoryTypeOrm implements RegisterRepositoryInterface {
       uuid: user.uuid,
     });
   }
+  async verifyAccount(uuid: string): Promise<void> {
+    await this.dataSource
+      .createQueryBuilder()
+      .update(UserModel)
+      .set([
+        {
+          is_verify: true,
+        },
+      ])
+      .where("uuid = :uuid", { uuid: uuid })
+      .execute();
+  }
 }

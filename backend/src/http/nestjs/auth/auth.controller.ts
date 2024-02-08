@@ -1,6 +1,6 @@
 import { RegisterGatewayLocal } from "@modules/auth/infra/register/gateway/registerGateway.local";
 import { RegisterRepositoryTypeOrm } from "@modules/auth/infra/register/repository/registerRepository.typeorm";
-import { Body, Controller, HttpStatus, Post, Res } from "@nestjs/common";
+import { Body, Controller, Get, HttpStatus, Param, Post, Res } from "@nestjs/common";
 import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { AuthRegisterUserResponse } from "./authRegister.response.dto";
 import { AuthRegisterUserRequestDto } from "./authRegister.request.dto";
@@ -10,6 +10,7 @@ import { AuthLoginRequestDto } from "./authLogin.request.dto";
 import { LoginUsecase } from "@modules/auth/core/login/usecases/login.usecase";
 import { LoginGatewayLocal } from "@modules/auth/infra/login/gateway/loginGatewayLocal.local";
 import { LoginRepositoryTypeorm } from "@modules/auth/infra/login/repository/loginRepositoryTypeOrm.orm";
+import { VerifyToken } from "@modules/auth/core/login/usecases/verifyToken.usecase";
 
 @ApiTags("Auth")
 @Controller("auth")
@@ -49,6 +50,15 @@ export class AuthController {
     response.status(HttpStatus.OK).send({
       message: "Login realizado com sucesso.",
       token: token,
+    });
+  }
+  @Get("verify/:token")
+  async verifyToken(@Res() response, @Param("token") token: string) {
+    const action = new VerifyToken(this.loginGateway, this.loginRepo);
+    const user = await action.execute(token);
+    response.status(HttpStatus.ACCEPTED).send({
+      message: "Usuario Autorizado.",
+      token: user.props,
     });
   }
 }
