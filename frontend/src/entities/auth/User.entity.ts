@@ -4,6 +4,7 @@ export type userProps = {
     phone_number?: string;
     avatar?: string;
     password: string;
+    token?: string;
   };
   
   export class UserEntity {
@@ -13,6 +14,9 @@ export type userProps = {
     }
     avatar(): string | undefined{
       return this.props.avatar;
+    }
+    token(): string | undefined{
+      return this.props.token;
     }
     userName(): string {
       return this.props.userName;
@@ -28,6 +32,9 @@ export type userProps = {
     }
     setEmail(email: string) {
       this.props.email = email;
+    }
+    setToken(token: string) {
+      this.props.token = token;
     }
   }
   

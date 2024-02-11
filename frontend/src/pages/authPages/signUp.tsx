@@ -5,56 +5,50 @@ import { GatewayContext } from '../../gateway/gatewayContext';
 import { UserEntity } from '../../entities/auth/User.entity';
 import Loader from '../../components/visual/Loader';
 import { useNavigate } from 'react-router';
+import CookieFactory from '../../utils/cookieFactory';
 function SignUp() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const gatewayContext = useContext(GatewayContext);
   const userGateway = gatewayContext?.userGateway;
+
   const [user, setUser] = useState<UserEntity>(new UserEntity({ email: '', userName: '', avatar: '', phone_number: '', password: '' }));
-  const [msg, setMsg] = useState({msg:null, status: null});
+  const [msg, setMsg] = useState({ msg: null, status: null });
   const [loading, setLoading] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState<string>('');
-  async function handleConfirmPasswordChange(e: ChangeEvent<HTMLInputElement>) {
+
+  const handleConfirmPasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setConfirmPassword(value);
-  }
-  async function handleOnChange(e: ChangeEvent<HTMLInputElement>) {
-    const { name, value } = e.target;
-    setUser((prevState) => {
-      const newUser = new UserEntity({ ...prevState.props, [name]: value });
-      return newUser;
-    });
-  }
-  useEffect(() => {
-    if (loading) {
-      document.body.style.pointerEvents = 'none';
-    } else {
-      document.body.style.pointerEvents = 'auto';
-    }
-  }, [loading])
+  };
 
-  async function submit(e: FormEvent<HTMLFormElement>) {
+  const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setUser((prevState) => new UserEntity({ ...prevState.props, [name]: value }));
+  };
+
+  useEffect(() => {
+    document.body.style.pointerEvents = loading ? 'none' : 'auto';
+  }, [loading]);
+
+  const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setMsg({msg: null, status: null});
+    setMsg({ msg: null, status: null });
     if (user.password() !== confirmPassword) {
-      setMsg({msg: "As senhas não são iguais", status: 400});
+      setMsg({ msg: 'As senhas não são iguais', status: 400 });
     } else {
       const response = await userGateway?.signUp(user);
-      setMsg({msg: response?.message, status: response?.status});
-      if (msg.status > 300 && msg.msg !== "Esse email já existe mas não foi verificado ainda, verifique sua caixa de email ou peça reenvio do token") {
-        setTimeout(() => {
-          navigate("/", {replace: true});
-        }, 2000)
-      } else if (msg.msg === "Esse email já existe mas não foi verificado ainda, verifique sua caixa de email ou peça reenvio do token") {
-        setTimeout(() => {
-          navigate(`/verify/account/token/${response?.user?.email()}`, {replace: true});
-        }, 2000)
+      setMsg({ msg: response?.message, status: response?.status });
+      if (response?.message === "Esse email já existe mas não foi verificado ainda, verifique sua caixa de email ou peça reenvio do token") {
+        setTimeout(() => navigate(`/verify/account/token/${user.email()}`), 1000);
       }
-      setLoading(false);
+      if (msg.status && msg.status < 300 && msg.msg !== "Esse email já existe mas não foi verificado ainda, verifique sua caixa de email ou peça reenvio do token") {
+        setTimeout(() => navigate("/"), 1000);
+      }
     }
-    setLoading(false);
-  }
 
+    setLoading(false);
+  };
   return (
     <div className="signBody">
       {msg.msg && 

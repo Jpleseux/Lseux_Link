@@ -12,21 +12,25 @@ export type userInput = {
   phone_number?: string;
   isVerify?: boolean;
 };
+export type signUpOutput = {
+  user: UserEntity;
+  token: string;
+};
 export class saveUserUsecase {
   constructor(
     readonly repo: RegisterRepositoryInterface,
     readonly gateway: RegisterGatewayInterface,
     readonly queue: RegisterEmailQueueInterface,
   ) {}
-  public async execute(user: userInput): Promise<UserEntity> {
-    const userDb = await this.repo.getUserByEMail(user.email);
-    if (userDb && userDb.isVerify() === false) {
+  public async execute(user: userInput): Promise<signUpOutput> {
+    const userDb = await this.repo.findByEmail(user.email);
+    if (userDb && userDb.is_verify() === false) {
       throw new apiError(
         "Esse email já existe mas não foi verificado ainda, verifique sua caixa de email ou peça reenvio do token",
         400,
         "item_already_exist",
       );
-    } else if (userDb && userDb.isVerify() === true) {
+    } else if (userDb && userDb.is_verify() === true) {
       throw new apiError("Este usuario já existe", 400, "item_already_exist");
     } else if ((await this.gateway.validateEmail(user.email)) === false) {
       throw new apiError("Este email é inválido", 400, "invalid_item");
@@ -49,6 +53,6 @@ export class saveUserUsecase {
       html: `<a href='http://localhost:5173/verify/account/${token}/${user.email}'><button style='font-size: 16px; font-weight: 600; padding: 1vh 1vw; cursor: pointer;border-radius: 1vh; color: #fff; background-color: #303f9f; border: none;'>Clique aqui!</button></a>`,
     };
     await this.queue.sendEmail(emailContent);
-    return output;
+    return { user: output, token: token };
   }
 }

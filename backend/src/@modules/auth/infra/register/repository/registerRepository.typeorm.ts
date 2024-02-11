@@ -22,34 +22,24 @@ export class RegisterRepositoryTypeOrm implements RegisterRepositoryInterface {
       .execute();
     return user;
   }
-  async getUserByEMail(email: string): Promise<UserEntity> {
-    const user = await this.dataSource
+  async verifyAccount(user: UserEntity): Promise<void> {
+    await this.dataSource
+      .getRepository(UserModel)
+      .createQueryBuilder()
+      .update(UserModel)
+      .set({ is_verify: true })
+      .where("uuid = :uuid", { uuid: user.uuid() })
+      .execute();
+  }
+  async findByEmail(email: string): Promise<UserEntity> {
+    const userDb = await this.dataSource
       .getRepository(UserModel)
       .createQueryBuilder()
       .where("email = :email", { email: email })
       .getOne();
-    if (!user) {
+    if (!userDb) {
       return;
     }
-    return new UserEntity({
-      email: user.email,
-      password: user.password,
-      phone_number: user.phone_number,
-      userName: user.userName,
-      isVerify: user.is_verify,
-      uuid: user.uuid,
-    });
-  }
-  async verifyAccount(uuid: string): Promise<void> {
-    await this.dataSource
-      .createQueryBuilder()
-      .update(UserModel)
-      .set([
-        {
-          is_verify: true,
-        },
-      ])
-      .where("uuid = :uuid", { uuid: uuid })
-      .execute();
+    return new UserEntity(userDb);
   }
 }

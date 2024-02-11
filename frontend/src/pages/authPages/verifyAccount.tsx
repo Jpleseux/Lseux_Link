@@ -1,65 +1,73 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
-import Input from '../../components/forms/input';
-import { useParams } from 'react-router';
+import { FormEvent, useContext, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
 import Message from '../../components/visual/Message.component';
 import Loader from '../../components/visual/Loader';
+import CookieFactory from '../../utils/cookieFactory';
+import { GatewayContext } from '../../gateway/gatewayContext';
 
 function VerifyAccount() {
-  const [token, setToken] = useState<string | undefined>('');
-  const { token: tokenParam } = useParams();
-  const { email: emailParam } = useParams();
+  const gatewayContext = useContext(GatewayContext);
+  const userGateway = gatewayContext?.userGateway;
+  const navigate = useNavigate();
+  const {token} = useParams();
   const [msg, setMsg] = useState({ msg: null, status: null });
   const [loading, setLoading] = useState(false);
   const [countdown, setCountdown] = useState(60);
-
-  function handleOnChange(e: ChangeEvent<HTMLInputElement>) {
-    setToken(e.target.value);
-  }
   async function resendToken() {
     console.log("Ok")
   }
-
-  useEffect(() => {
-    setToken(tokenParam);
-  }, [tokenParam]);
-
-  useEffect(() => {
-    setCountdown(30);
+  async function Counter() {
+    setCountdown(5);
     const interval = setInterval(() => {
         setCountdown((prevCountdown) => prevCountdown - 1);
       }, 1000);
 
       return () => clearInterval(interval);
-  }, []);
-
+  }
+  async function verifyToken() {
+    if (token) {
+      const response = await userGateway?.verifyAccount(token);
+      console.log(response);
+      setLoading(true);
+      setMsg({msg: response?.message, status: response?.status});
+      if (response?.message === "Esse usuario já foi verificado") {
+        document.body.style.pointerEvents = loading ? 'none' : 'auto';
+        setTimeout(() => navigate("/"), 1000);
+      } else if (response?.status >= 300) {
+        document.body.style.pointerEvents = loading ? 'none' : 'auto';
+        setTimeout(() => navigate("/"), 1000);
+      }
+      setLoading(false);
+    }
+  }
+  useEffect(() => {
+    verifyToken();
+    Counter();
+  }, [token]);
+  useEffect(() => {
+    document.body.style.pointerEvents = loading ? 'none' : 'auto';
+  }, [loading]);
+  async function submit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+  }
   return (
     <div>
       {msg.msg && <Message msg={msg.msg} status={msg.status} timers={3000} />}
-      <form className='form'>
+      <form className='form' onSubmit={submit}>
         {loading && <Loader />}
-        <p className="title">Verifique sua conta</p>
+        <p className="title">Verifique sua conta pelo email que enviamos</p>
         <p className="message">Verifique sua conta para acessar o sistema.</p>
-        <Input handleOnChange={handleOnChange} value={token} name='token' type='text' placeholder='Insira seu token' />
-        <div className="buttons">
-        <button type="submit" className="submit">
-          Verificar Conta
-        </button>
-        </div>
         <p className="signin">Não recebeu o email de verificação ?</p>
         <div className="buttons">
         {countdown > 0 ? <p>{`Reenviar em ${countdown} segundos`} </p>:           
             <div>
-                <button onClick={resendToken} type="button" className="resend" disabled={countdown > 0}>
+                <button onClick={resendToken} type="submit" className="submit" disabled={countdown > 0}>
                 Reenviar email
                 </button>
             </div>
         }
         </div>
-        <a href="/">
-            <button type="button" className="submit">
-                Login
-            </button>
-        </a>
+        <p className='signin'>Já verificou a conta, vá para: <a href='/'>Login</a></p>
       </form>
     </div>
   );

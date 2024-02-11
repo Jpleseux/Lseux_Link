@@ -7,7 +7,9 @@ export default class AxiosAdapter implements httpClient {
           headers: {
               "Content-Type": "application/json"
           }
-      });
+      })
+      .then(response => ({ data: response.data, status: response.status }))
+      .catch(response => ({ data: response.response.data, status: response.response.status }));
       return data;
     }
 

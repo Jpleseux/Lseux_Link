@@ -1,5 +1,5 @@
 import { createContext, ReactNode } from 'react';
-import fetchAdapter from '../http/fetch/axiosAdapter';
+import fetchAdapter from '../http/axios/axiosAdapter';
 import { HttpUserGateway } from './http/auth/httpUserGateway.local';
 interface GatewayContextType {
   userGateway: HttpUserGateway,

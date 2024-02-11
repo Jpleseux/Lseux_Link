@@ -5,7 +5,6 @@ function Message({msg, status, timers}:any) {
     const [type, setType] = useState<string>();
     const [visible, setVisible] = useState(false)
     useEffect(()=> {
-        console.log(status);
         if (status >= 300) {setType("error");} else {setType("success")}
         if(!msg){
             setVisible(false)

@@ -11,6 +11,8 @@ import { LoginUsecase } from "@modules/auth/core/login/usecases/login.usecase";
 import { LoginGatewayLocal } from "@modules/auth/infra/login/gateway/loginGatewayLocal.local";
 import { LoginRepositoryTypeorm } from "@modules/auth/infra/login/repository/loginRepositoryTypeOrm.orm";
 import { VerifyToken } from "@modules/auth/core/login/usecases/verifyToken.usecase";
+import { VerifyAccountUsecase } from "@modules/auth/core/register/usecases/verifyAccount.usecase";
+import { ResendEmailVerifyAccountUsecase } from "@modules/auth/core/register/usecases/resendEmailVerifyAccount.usecase";
 
 @ApiTags("Auth")
 @Controller("auth")
@@ -31,11 +33,12 @@ export class AuthController {
   async saveUser(@Body() body: AuthRegisterUserRequestDto, @Res() response) {
     try {
       const action = new saveUserUsecase(this.registerRepo, this.registerGateway, this.queue);
-      const user = await action.execute(body);
+      const output = await action.execute(body);
       response.status(HttpStatus.OK).send({
         message:
           "Usuario salvo com sucesso, um email de verificação foi enviado a sua caixa de email, acesse o link para verificar.",
-        user: user.props,
+        user: output.user.props,
+        token: output.token,
       });
     } catch (error) {
       response.status(HttpStatus.BAD_REQUEST).send({
@@ -46,10 +49,11 @@ export class AuthController {
   @Post("login")
   async Login(@Body() body: AuthLoginRequestDto, @Res() response) {
     const action = new LoginUsecase(this.loginGateway, this.loginRepo);
-    const token = await action.execute(body);
+    const output = await action.execute(body);
     response.status(HttpStatus.OK).send({
       message: "Login realizado com sucesso.",
-      token: token,
+      token: output.token,
+      user: output.user,
     });
   }
   @Get("verify/:token")
@@ -59,6 +63,23 @@ export class AuthController {
     response.status(HttpStatus.ACCEPTED).send({
       message: "Usuario Autorizado.",
       token: user.props,
+    });
+  }
+  @Get("verify/account/:token")
+  async verifyAccount(@Res() response, @Param("token") token: string) {
+    const action = new VerifyAccountUsecase(this.registerGateway, this.registerRepo);
+    const user = await action.execute(token);
+    response.status(HttpStatus.ACCEPTED).send({
+      message: "Conta verificada.",
+      user: user.props,
+    });
+  }
+  @Get("resend/verify-email/:email")
+  async ResendEmaiVerifyAccountlToUser(@Res() response, @Param("email") email: string) {
+    const action = new ResendEmailVerifyAccountUsecase(this.registerRepo, this.queue, this.registerGateway);
+    await action.execute(email);
+    response.status(HttpStatus.ACCEPTED).send({
+      message: `Email reenviado para ${email}, verifique sua caixa de email.`,
     });
   }
 }

@@ -17,7 +17,7 @@ describe("Deve testar o saveUserUsecase", () => {
   });
   test("Deve logar um usuario", async () => {
     const action = new LoginUsecase(gateway, repo);
-    const token = await action.execute({
+    const { token } = await action.execute({
       email: "user1@gmail.com",
       password: "123456",
     });
