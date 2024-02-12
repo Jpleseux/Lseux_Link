@@ -40,6 +40,9 @@ export class UserEntity {
   setPassword(Password: string) {
     this.props.password = Password;
   }
+  setAvatar(avatar: string) {
+    this.props.avatar = avatar;
+  }
   setIs_ierify(is_verify: boolean) {
     this.props.is_verify = is_verify;
   }

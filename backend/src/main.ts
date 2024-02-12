@@ -4,6 +4,8 @@ import { urlencoded, json } from "express";
 import { ValidationPipe } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { AuthModule } from "./http/nestjs/auth/auth.module";
+import { ProfileModule } from "./http/nestjs/profile/profile.module";
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
   const corsOptions = {
@@ -11,6 +13,7 @@ async function bootstrap() {
     methods: "*",
     credentials: true,
   };
+
   app.useGlobalPipes(new ValidationPipe({ stopAtFirstError: true }));
   app.enableCors(corsOptions);
   app.use(json({ limit: "50mb" }));
@@ -21,11 +24,22 @@ async function bootstrap() {
     .setDescription("Documentação LseuxLink")
     .setVersion("1.0")
     .addTag("Auth")
-    .addBearerAuth({ type: "http", scheme: "bearer", bearerFormat: "JWT", in: "header" }, "Authorization")
+    .addTag("Profile")
     .build();
 
+  swaggerConfig.security = [{ bearerAuth: [] }];
+  swaggerConfig.components = {
+    securitySchemes: {
+      bearerAuth: {
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT",
+      },
+    },
+  };
+
   const swaggerDoc = SwaggerModule.createDocument(app, swaggerConfig, {
-    include: [AuthModule],
+    include: [ProfileModule, AuthModule],
   });
 
   SwaggerModule.setup("doc", app, swaggerDoc);

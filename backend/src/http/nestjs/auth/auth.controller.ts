@@ -53,7 +53,7 @@ export class AuthController {
     response.status(HttpStatus.OK).send({
       message: "Login realizado com sucesso.",
       token: output.token,
-      user: output.user,
+      user: output.user.props,
     });
   }
   @Get("verify/:token")

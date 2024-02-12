@@ -62,12 +62,12 @@ export class HttpUserGateway implements userGateway {
         const response = await this.httpClient.post("auth/login", input);
         if (response && response.status < 300) {
             const userRes =  new UserEntity({
-                email: response.data.user.props.email,
-                userName: response.data.user.props.userName,
-                phone_number: response.data.user.props.phone_number,
-                password: response.data.user.props.password,
+                email: response.data.user.email,
+                userName: response.data.user.userName,
+                phone_number: response.data.user.phone_number,
+                password: response.data.user.password,
                 token: response.data.token,
-                avatar: response.data.user.props.avatar,
+                avatar: response.data.user.avatar,
             })
             return {
                 token: response.data.token,

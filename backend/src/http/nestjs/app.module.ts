@@ -5,7 +5,8 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { RabbitMQModule } from "@golevelup/nestjs-rabbitmq";
 import { UserModel } from "@modules/auth/infra/database/models/UserModel.model";
 import { AuthModule } from "./auth/auth.module";
-
+import { UserModel as profileUserModel } from "@modules/profile/infra/database/models/UserModel.model";
+import { ProfileModule } from "./profile/profile.module";
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -16,12 +17,13 @@ import { AuthModule } from "./auth/auth.module";
       username: process.env.DB_DEFAULT_USENAME,
       schema: process.env.DB_DEFAULT_SCHEMA ?? "public",
       password: process.env.DB_DEFAULT_PASSWORD,
-      entities: [UserModel],
+      entities: [UserModel, profileUserModel],
     }),
     RabbitMQModule.forRoot(RabbitMQModule, {
       uri: process.env.RABBITMQ_URL,
     }),
     AuthModule,
+    ProfileModule,
   ],
   controllers: [AppController],
   providers: [],

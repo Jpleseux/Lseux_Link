@@ -43,12 +43,25 @@ export class UserEntity {
   setIs_ierify(is_verify: boolean) {
     this.props.is_verify = is_verify;
   }
+  setAvatar(avatar: string) {
+    this.props.avatar = avatar;
+  }
   payloadToken() {
-    const payload: any = {
-      uuid: this.props.uuid,
-      name: this.props.userName,
-      email: this.props.email,
-    };
-    return payload;
+    if (this.props.avatar) {
+      const payload: any = {
+        uuid: this.props.uuid,
+        name: this.props.userName,
+        email: this.props.email,
+        avatar: this.props.avatar,
+      };
+      return payload;
+    } else {
+      const payload: any = {
+        uuid: this.props.uuid,
+        name: this.props.userName,
+        email: this.props.email,
+      };
+      return payload;
+    }
   }
 }
