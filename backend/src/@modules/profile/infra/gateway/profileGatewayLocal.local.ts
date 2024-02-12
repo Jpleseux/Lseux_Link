@@ -1,11 +1,12 @@
-import { DataSource } from "typeorm";
-import * as bcrypt from "bcrypt";
-import { UserEntity } from "@modules/auth/core/register/entities/user.entity";
+import { ProfileGatewayInterface } from "@modules/profile/core/profileGatewayInterface.interface";
 import * as jwt from "jsonwebtoken";
-import { RegisterGatewayInterface } from "@modules/auth/core/register/registerGateway.interface";
-import { apiError } from "../../../../../http/nestjs/helpers/api-Error.helper";
+import * as bcrypt from "bcryptjs";
+import { UserEntity } from "@modules/profile/core/entities/user.entity";
+import { DataSource } from "typeorm";
+import { apiError } from "../../../../http/nestjs/helpers/api-Error.helper";
 const segredo = "3cba50ad-324e-4f26-9bb9-3304bfc2c30e";
-export class RegisterGatewayLocal implements RegisterGatewayInterface {
+
+export class ProfileGatewayLocal implements ProfileGatewayInterface {
   constructor(readonly datasorce: DataSource) {}
   async validateEmail(email: string): Promise<string | boolean> {
     return String(email)

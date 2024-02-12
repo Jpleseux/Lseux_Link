@@ -71,7 +71,7 @@ function Login() {
                         </button>
                     </div>
                 </div>
-                <p className='signin'>Não tem uma conta? vá para: <a href='/signup'>Login</a></p>
+                <p className='signin'>Não tem uma conta? vá para: <a href='/signup'>Cadastro</a></p>
             </form>
         </div>
     )

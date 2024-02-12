@@ -5,6 +5,7 @@ import { getDataSourceToken } from "@nestjs/typeorm";
 import { DataSource } from "typeorm";
 import { AuthorizationMiddleware } from "../middlewares/autorization.middleware";
 import { middlewareGateway } from "@modules/shared/infra/gateway/middleware.gateway";
+import { ProfileGatewayLocal } from "@modules/profile/infra/gateway/profileGatewayLocal.local";
 
 @Module({
   controllers: [ProfileController],
@@ -20,6 +21,13 @@ import { middlewareGateway } from "@modules/shared/infra/gateway/middleware.gate
       provide: middlewareGateway,
       useFactory: (dataSource: DataSource) => {
         return new middlewareGateway(dataSource);
+      },
+      inject: [getDataSourceToken()],
+    },
+    {
+      provide: ProfileGatewayLocal,
+      useFactory: (dataSource: DataSource) => {
+        return new ProfileGatewayLocal(dataSource);
       },
       inject: [getDataSourceToken()],
     },
