@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { AuthController } from "./auth.controller";
 import { RegisterRepositoryTypeOrm } from "@modules/auth/infra/register/repository/registerRepository.typeorm";
 import { DataSource } from "typeorm";
@@ -10,6 +10,8 @@ import { rejects } from "assert";
 import { ConsumeEmailService } from "./consumerEmailService.service";
 import { LoginRepositoryTypeorm } from "@modules/auth/infra/login/repository/loginRepositoryTypeOrm.orm";
 import { LoginGatewayLocal } from "@modules/auth/infra/login/gateway/loginGatewayLocal.local";
+import { middlewareGateway } from "@modules/shared/infra/gateway/middleware.gateway";
+import { AuthorizationMiddleware } from "../middlewares/autorization.middleware";
 @Module({
   controllers: [AuthController],
   providers: [
@@ -42,6 +44,13 @@ import { LoginGatewayLocal } from "@modules/auth/infra/login/gateway/loginGatewa
       inject: [getDataSourceToken()],
     },
     {
+      provide: middlewareGateway,
+      useFactory: (dataSource: DataSource) => {
+        return new middlewareGateway(dataSource);
+      },
+      inject: [getDataSourceToken()],
+    },
+    {
       provide: RegisterEmailQueue,
       useFactory: async (repo: RegisterRepositoryTypeOrm) => {
         const connection = await amqplib.connect("amqp://admin:admin@rabbitmq:5672");
@@ -62,4 +71,8 @@ import { LoginGatewayLocal } from "@modules/auth/infra/login/gateway/loginGatewa
     ConsumeEmailService,
   ],
 })
-export class AuthModule {}
+export class AuthModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AuthorizationMiddleware).forRoutes("auth/protected");
+  }
+}

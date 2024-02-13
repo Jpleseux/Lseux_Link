@@ -42,4 +42,13 @@ export class RegisterRepositoryTypeOrm implements RegisterRepositoryInterface {
     }
     return new UserEntity(userDb);
   }
+  async recoveryPassword(user: UserEntity): Promise<void> {
+    await this.dataSource
+      .getRepository(UserModel)
+      .createQueryBuilder()
+      .update(UserModel)
+      .set({ password: user.password() })
+      .where("uuid = :uuid", { uuid: user.uuid() })
+      .execute();
+  }
 }

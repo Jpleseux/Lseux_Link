@@ -32,11 +32,11 @@ function Login() {
         setMsg({msg: response?.message, status: response?.status})
         setUser(response?.user);
         if (response && response.status && response.status > 300 && response?.message === "Esse email já existe mas não foi verificado ainda, verifique sua caixa de email ou peça reenvio do token") {
-            setTimeout(() => navigate(`/verify/account/token/${loginInput.email}`), 1000);
+            setTimeout(() => navigate(`/verify/account/token/${loginInput.email}`), 3000);
         }
         if (response && response.status < 300) {
             await factory.addCookie("user", response.user?.props);
-            setTimeout(() => navigate(`/home/index`), 1000);
+            setTimeout(() => navigate(`/home/index`), 3000);
         }
         setLoading(false);
     }

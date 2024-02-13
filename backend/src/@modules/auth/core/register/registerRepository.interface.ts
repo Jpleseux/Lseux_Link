@@ -4,4 +4,5 @@ export interface RegisterRepositoryInterface {
   saveUser(user: UserEntity): Promise<UserEntity>;
   verifyAccount(user: UserEntity): Promise<void>;
   findByEmail(email: string): Promise<UserEntity>;
+  recoveryPassword(user: UserEntity): Promise<void>;
 }

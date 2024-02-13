@@ -1,6 +1,7 @@
+import { SendEmailRecoveryPasswordUsecase } from "./../../../@modules/auth/core/register/usecases/sendEmailRecoveryPassword.usecase";
 import { RegisterGatewayLocal } from "@modules/auth/infra/register/gateway/registerGateway.local";
 import { RegisterRepositoryTypeOrm } from "@modules/auth/infra/register/repository/registerRepository.typeorm";
-import { Body, Controller, Get, HttpStatus, Param, Post, Res } from "@nestjs/common";
+import { Body, Controller, Get, HttpStatus, Param, Post, Req, Res } from "@nestjs/common";
 import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { AuthRegisterUserResponse } from "./authRegister.response.dto";
 import { AuthRegisterUserRequestDto } from "./authRegister.request.dto";
@@ -13,6 +14,8 @@ import { LoginRepositoryTypeorm } from "@modules/auth/infra/login/repository/log
 import { VerifyToken } from "@modules/auth/core/login/usecases/verifyToken.usecase";
 import { VerifyAccountUsecase } from "@modules/auth/core/register/usecases/verifyAccount.usecase";
 import { ResendEmailVerifyAccountUsecase } from "@modules/auth/core/register/usecases/resendEmailVerifyAccount.usecase";
+import { RecoveryPasswordUsecase } from "@modules/auth/core/register/usecases/recoveryPassword.usecase";
+import { AuthRecoveryPasswordDto } from "./AuthRecoveryPassword.request.dto";
 
 @ApiTags("Auth")
 @Controller("auth")
@@ -60,7 +63,7 @@ export class AuthController {
   async verifyToken(@Res() response, @Param("token") token: string) {
     const action = new VerifyToken(this.loginGateway, this.loginRepo);
     const user = await action.execute(token);
-    response.status(HttpStatus.ACCEPTED).send({
+    response.status(HttpStatus.OK).send({
       message: "Usuario Autorizado.",
       token: user.props,
     });
@@ -69,7 +72,7 @@ export class AuthController {
   async verifyAccount(@Res() response, @Param("token") token: string) {
     const action = new VerifyAccountUsecase(this.registerGateway, this.registerRepo);
     const user = await action.execute(token);
-    response.status(HttpStatus.ACCEPTED).send({
+    response.status(HttpStatus.OK).send({
       message: "Conta verificada.",
       user: user.props,
     });
@@ -78,8 +81,26 @@ export class AuthController {
   async ResendEmaiVerifyAccountlToUser(@Res() response, @Param("email") email: string) {
     const action = new ResendEmailVerifyAccountUsecase(this.registerRepo, this.queue, this.registerGateway);
     await action.execute(email);
-    response.status(HttpStatus.ACCEPTED).send({
+    response.status(HttpStatus.OK).send({
       message: `Email reenviado para ${email}, verifique sua caixa de email.`,
+    });
+  }
+  @Post("protected/recovery/password")
+  async RecoveryPassword(@Body() body: AuthRecoveryPasswordDto, @Res() response, @Req() request: Request) {
+    const tokenDecoded = request["tokenPayload"];
+    const action = new RecoveryPasswordUsecase(this.registerRepo, this.registerGateway);
+    const user = await action.execute(tokenDecoded.email, body.password);
+    response.status(HttpStatus.OK).send({
+      message: "Senha atualizada",
+      user: user.props,
+    });
+  }
+  @Get("send/email/recovery/password/:email")
+  async SendEmailRecoveryPassword(@Res() response, @Param("email") email: string) {
+    const action = new SendEmailRecoveryPasswordUsecase(this.queue, this.registerRepo, this.registerGateway);
+    await action.execute(email);
+    response.status(HttpStatus.OK).send({
+      message: "Email enviado para: " + email,
     });
   }
 }

@@ -40,10 +40,10 @@ function SignUp() {
       const response = await userGateway?.signUp(user);
       setMsg({ msg: response?.message, status: response?.status });
       if (response?.message === "Esse email já existe mas não foi verificado ainda, verifique sua caixa de email ou peça reenvio do token") {
-        setTimeout(() => navigate(`/verify/account/token/${user.email()}`), 1000);
+        setTimeout(() => navigate(`/verify/account/token/${user.email()}`), 3000);
       }
       if (msg.status && msg.status < 300 && msg.msg !== "Esse email já existe mas não foi verificado ainda, verifique sua caixa de email ou peça reenvio do token") {
-        setTimeout(() => navigate("/"), 1000);
+        setTimeout(() => navigate("/"), 3000);
       }
     }
 

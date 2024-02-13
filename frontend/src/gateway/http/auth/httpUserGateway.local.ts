@@ -1,3 +1,4 @@
+import { ResendEmailVerifyAccountUsecase } from './../../../../../backend/src/@modules/auth/core/register/usecases/resendEmailVerifyAccount.usecase';
 import { UserEntity } from "../../../entities/auth/User.entity";
 import httpClient from "../../../http/httpClient";
 import { userGateway } from "../../interfaces/auth/userGateway";
@@ -27,10 +28,10 @@ export class HttpUserGateway implements userGateway {
         const response = await this.httpClient.post("auth/save/user", user.props);
         if (response && response.status < 300) {
             const userRes =  new UserEntity({
-                email: response.data.user.props.email,
-                userName: response.data.user.props.userName,
-                phone_number: response.data.user.props.phone_number,
-                password: response.data.user.props.password
+                email: response.data.user.email,
+                userName: response.data.user.userName,
+                phone_number: response.data.user.phone_number,
+                password: response.data.user.password
             })
             return {
                 token: response.data.token,
@@ -45,10 +46,10 @@ export class HttpUserGateway implements userGateway {
         }
     }
     async ResendEmailVerifyAccountToUser(email: string): Promise<Output> {
-        const response = await this.httpClient.get(`resend/verify-email/${email}`);
+        const response = await this.httpClient.get(`auth/resend/verify-email/${email}`);
         return {
-            status: response.status,
-            message: response.data.message,
+            status: response.statusCode,
+            message: response.message,
         }
     }
     async verifyAccount(token: string): Promise<Output> {
