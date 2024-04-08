@@ -38,4 +38,15 @@ export class ProfileRepositoryTypeOrm implements ProfileRepositoryInterface {
       .where("uuid = :uuid", { uuid })
       .execute();
   }
+  async findUserByEmail(email: string): Promise<UserEntity> {
+    const userDb = await this.dataSource
+      .getRepository(UserModel)
+      .createQueryBuilder()
+      .where("email = :email", { email: email })
+      .getOne();
+    if (!userDb) {
+      return;
+    }
+    return new UserEntity(userDb);
+  }
 }

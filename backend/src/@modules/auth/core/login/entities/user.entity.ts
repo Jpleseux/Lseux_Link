@@ -43,6 +43,9 @@ export class UserEntity {
   setIs_verify(is_verify: boolean) {
     this.props.is_verify = is_verify;
   }
+  setAvatar(avatar: string | null) {
+    this.props.avatar = avatar;
+  }
   payloadToken() {
     const payload: any = {
       uuid: this.props.uuid,

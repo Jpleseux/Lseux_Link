@@ -9,6 +9,7 @@ import VerifyAccount from './pages/authPages/verifyAccount.tsx'
 import Login from './pages/authPages/Login.tsx'
 import Home from './Home.tsx'
 import Index from './pages/home/index.tsx'
+import Profile from './pages/home/profile.tsx'
 const router = createBrowserRouter([
   {
     path:"/",
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
       {
         path: "index",
         element: <Index />
+      },
+      {
+        path: "profile",
+        element: <Profile />
       }
     ]
   }

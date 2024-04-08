@@ -7,7 +7,8 @@ export class AuthorizationMiddleware implements NestMiddleware {
 
   async use(req: any, res: any, next: (error?: any) => void) {
     const BearerToken = req.headers["authorization"];
-    if (!BearerToken) {
+    console.log(BearerToken);
+    if (!BearerToken || !(await this.authGateway.tokenDecoding(BearerToken.split(" ")[1]))) {
       throw new HttpException(
         {
           message: "Você deve estar logado para acessar essa página",

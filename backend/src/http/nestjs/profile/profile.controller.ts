@@ -1,11 +1,12 @@
 import { SetNewAvatarUsecase } from "@modules/profile/core/usecases/setNewAvatar.usecase";
 import { ProfileRepositoryTypeOrm } from "@modules/profile/infra/repository/profileRepository.TypeOrm";
-import { Body, Controller, HttpStatus, Patch, Req, Res } from "@nestjs/common";
+import { Body, Controller, Get, HttpStatus, Patch, Req, Res } from "@nestjs/common";
 import { ProfileSetNewAvatarDto } from "./profileSetNewAvatar.dto";
 import { ApiTags } from "@nestjs/swagger";
 import { ProfileGatewayLocal } from "@modules/profile/infra/gateway/profileGatewayLocal.local";
 import { UpdateProfileUsecase } from "@modules/profile/core/usecases/updateProfile.usecase";
 import { ProfileUpdateUserRequest } from "./profileUpdateUser.request.dto";
+import { FindUserByEmailUsecase } from "@modules/profile/core/usecases/finUserByEmail.usecase";
 
 @ApiTags("Profile")
 @Controller("profile")
@@ -34,6 +35,16 @@ export class ProfileController {
     const user = await action.execute(tokenDecoded.uuid, body);
     response.status(HttpStatus.OK).send({
       message: "usuario atualizado com sucesso",
+      user: user.props,
+    });
+  }
+  @Get("user/email")
+  async FindUserByEmail(@Req() request: Request, @Res() response) {
+    const tokenDecoded = request["tokenPayload"];
+    const action = new FindUserByEmailUsecase(this.repo);
+    const user = await action.execute(tokenDecoded.email);
+    response.status(HttpStatus.OK).send({
+      message: "Usuario encontrado",
       user: user.props,
     });
   }

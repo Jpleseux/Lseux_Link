@@ -5,4 +5,5 @@ export interface ProfileRepositoryInterface {
   findUserByUuid(uuid: string): Promise<UserEntity>;
   setNewAvatar(user: UserEntity): Promise<void>;
   updateUser(uuid: string, newUser: Partial<userProps>): Promise<void>;
+  findUserByEmail(email: string): Promise<UserEntity>;
 }
