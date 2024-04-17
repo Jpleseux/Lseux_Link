@@ -78,3 +78,11 @@
   .success__close path {
     fill: #393A37;
   }
+  .error,
+.success {
+  position: fixed; /* Define a posição fixa */
+  top: 20px; /* Define a distância do topo */
+  right: 20px; /* Define a distância da direita */
+  z-index: 9999; /* Define a ordem de sobreposição */
+  /* Restante do seu estilo... */
+}

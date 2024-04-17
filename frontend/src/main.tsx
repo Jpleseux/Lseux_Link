@@ -10,6 +10,8 @@ import Login from './pages/authPages/Login.tsx'
 import Home from './Home.tsx'
 import Index from './pages/home/index.tsx'
 import Profile from './pages/home/profile.tsx'
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min";
 const router = createBrowserRouter([
   {
     path:"/",

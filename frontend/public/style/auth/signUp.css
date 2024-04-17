@@ -3,7 +3,7 @@ body {
     background: linear-gradient(90deg, rgba(24,134,174,1) 0%, rgba(125,196,219,1) 83%);
 }
 .form {
-    margin-top: 5%;
+    margin-top: 2%;
     display: flex;
     flex-direction: column;
     gap: 10px;
