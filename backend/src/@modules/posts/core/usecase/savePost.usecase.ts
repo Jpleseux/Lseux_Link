@@ -20,6 +20,7 @@ export class SavePostUsecase {
       text: input.text,
       userUuid: input.userUuid,
       title: input.title,
+      user: user,
       uuid: randomUUID(),
     });
     await this.repo.save(post);

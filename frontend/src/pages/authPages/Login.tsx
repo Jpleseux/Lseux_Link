@@ -41,11 +41,11 @@ function Login() {
         setLoading(false);
     }
     return (
-        <div>
+        <div className="container justify-content-center" style={{ marginTop: '100px' }}>
             {msg.msg && <Message msg={msg.msg} status={msg.status} timers={3000} />}
             <form className='form' onSubmit={submit}>
             {loading && <Loader />}
-                <p className="title">Faça login para acessar o site</p>
+                <p className="title-login">Faça login para acessar o site</p>
                 <label>
                 <input
                     onChange={handleOnChange}

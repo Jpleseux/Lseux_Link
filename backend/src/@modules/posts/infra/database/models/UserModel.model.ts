@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from "typeorm";
 
 @Entity("auth_users")
-export class UserModel {
+export class PostsUserModel {
   @PrimaryColumn("uuid")
   uuid: string;
   @CreateDateColumn()

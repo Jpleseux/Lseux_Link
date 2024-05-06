@@ -9,10 +9,12 @@ export type updatePostInput = {
 };
 export class updatePostUsecase {
   constructor(readonly repo: PostsRepositoryInterface) {}
-  public async execute(uuid: string, input: Partial<updatePostInput>): Promise<PostEntity> {
+  public async execute(uuid: string, input: Partial<updatePostInput>, userUuid: string): Promise<PostEntity> {
     const post = await this.repo.findPostByUuid(uuid);
     if (!post) {
       throw new apiError("Nenhum Post encontrado", 404, "NOT_FOUND");
+    } else if (post.userUuid() !== userUuid) {
+      throw new apiError("Você não pode deletar esse post", 401, "UNAUTHORIZED");
     }
     if (input.images && input.images.length > 0) {
       if (post.images() && post.images().length > 0) {
@@ -21,6 +23,7 @@ export class updatePostUsecase {
         });
       }
     }
-    
+    await this.repo.updatePost(uuid, input);
+    return await this.repo.findPostByUuid(uuid);
   }
 }

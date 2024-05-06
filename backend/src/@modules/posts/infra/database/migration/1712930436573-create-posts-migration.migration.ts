@@ -41,7 +41,18 @@ export class CreatePostsMigration1712930436573 implements MigrationInterface {
             type: "uuid",
           },
           {
+            name: "like",
+            default: 0,
+            type: "integer",
+          },
+          {
+            name: "des_like",
+            default: 0,
+            type: "integer",
+          },
+          {
             name: "images",
+            isNullable: true,
             type: "jsonb",
           },
         ],

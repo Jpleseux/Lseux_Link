@@ -3,7 +3,8 @@ import { PostsRepositoryInterface } from "@modules/posts/core/postsRepository.in
 import { DataSource } from "typeorm";
 import { PostModel } from "../database/models/Post.model";
 import { UserEntity } from "@modules/posts/core/entities/user.entity";
-import { UserModel } from "../database/models/UserModel.model";
+import { PostsUserModel } from "../database/models/UserModel.model";
+import { updatePostInput } from "@modules/posts/core/usecase/updatePost.usecase";
 
 export class PostsRepositoryTypeOrm implements PostsRepositoryInterface {
   constructor(private dataSource: DataSource) {}
@@ -25,7 +26,7 @@ export class PostsRepositoryTypeOrm implements PostsRepositoryInterface {
   }
   async findUserByUuid(uuid: string): Promise<UserEntity> {
     const userDb = await this.dataSource
-      .getRepository(UserModel)
+      .getRepository(PostsUserModel)
       .createQueryBuilder()
       .where("uuid = :uuid", { uuid: uuid })
       .getOne();
@@ -48,6 +49,9 @@ export class PostsRepositoryTypeOrm implements PostsRepositoryInterface {
       title: postDB.title,
       text: postDB.text,
       uuid: postDB.uuid,
+      desLike: postDB.des_like,
+      like: postDB.like,
+      user: await this.findUserByUuid(postDB.user_uuid),
       userUuid: postDB.user_uuid,
     });
   }
@@ -70,7 +74,10 @@ export class PostsRepositoryTypeOrm implements PostsRepositoryInterface {
           images: postDB.images,
           title: postDB.title,
           text: postDB.text,
+          user: await this.findUserByUuid(postDB.user_uuid),
           uuid: postDB.uuid,
+          desLike: postDB.des_like,
+          like: postDB.like,
           userUuid: postDB.user_uuid,
         }),
       );
@@ -96,11 +103,17 @@ export class PostsRepositoryTypeOrm implements PostsRepositoryInterface {
           images: postDB.images,
           title: postDB.title,
           text: postDB.text,
+          user: await this.findUserByUuid(postDB.user_uuid),
           uuid: postDB.uuid,
+          desLike: postDB.des_like,
+          like: postDB.like,
           userUuid: postDB.user_uuid,
         }),
       );
     }
     return posts;
+  }
+  async updatePost(uuid: string, input: Partial<updatePostInput>): Promise<void> {
+    await this.dataSource.createQueryBuilder().update(PostModel).set(input).where("uuid = :uuid ", { uuid: uuid }).execute();
   }
 }

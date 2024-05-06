@@ -5,11 +5,13 @@ import { ValidationPipe } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { AuthModule } from "./http/nestjs/auth/auth.module";
 import { ProfileModule } from "./http/nestjs/profile/profile.module";
+import { PostsModule } from "./http/nestjs/posts/post.module";
+require("dotenv").config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
   const corsOptions = {
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL,
     methods: "*",
     credentials: true,
   };
@@ -25,6 +27,7 @@ async function bootstrap() {
     .setVersion("1.0")
     .addTag("Auth")
     .addTag("Profile")
+    .addTag("Posts")
     .build();
 
   swaggerConfig.security = [{ bearerAuth: [] }];
@@ -39,7 +42,7 @@ async function bootstrap() {
   };
 
   const swaggerDoc = SwaggerModule.createDocument(app, swaggerConfig, {
-    include: [ProfileModule, AuthModule],
+    include: [ProfileModule, AuthModule, PostsModule],
   });
 
   SwaggerModule.setup("doc", app, swaggerDoc);

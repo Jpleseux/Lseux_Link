@@ -19,7 +19,11 @@ export class PostModel {
     nullable: false,
     default: !!process.env.JEST_WORKER_ID ? "{}" : {},
   })
-  images: string[];
+  images?: string[];
   @Column()
   user_uuid: string;
+  @Column({ default: 0 })
+  like?: number;
+  @Column({ default: 0 })
+  des_like?: number;
 }

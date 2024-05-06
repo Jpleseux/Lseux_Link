@@ -9,13 +9,7 @@ import './style.css';
 import { useNavigate } from 'react-router';
 
 function NavBar() {
-    const navigate = useNavigate();
-  useEffect(() => {
-    const container = document.getElementById('container');
-    if (container) {
-      container.classList.add('active');
-    }
-  }, []);
+  const navigate = useNavigate();
 
   async function toggle() {
     const container = document.getElementById('container');
@@ -32,10 +26,6 @@ function NavBar() {
           <a href="#" id="toggle" onClick={toggle}>
             <IoIosMenu />
           </a>
-        </div>
-        <div className="search">
-          <CiSearch id="searchIcon" />
-          <input type="search" name="search" id="search" placeholder="Search" />
         </div>
         <div className="navbar">
           <ul>

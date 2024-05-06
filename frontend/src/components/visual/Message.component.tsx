@@ -19,7 +19,7 @@ function Message({msg, status, timers}:any) {
     return (
         <>
             {visible && (
-            <div className={`${type}`}>
+            <div className={`notify_message ${type}`}>
                 <div className={`${type}__icon`}>
                     <IoMdAlert />
                 </div>

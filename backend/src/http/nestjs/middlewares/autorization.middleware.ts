@@ -7,7 +7,6 @@ export class AuthorizationMiddleware implements NestMiddleware {
 
   async use(req: any, res: any, next: (error?: any) => void) {
     const BearerToken = req.headers["authorization"];
-    console.log(BearerToken);
     if (!BearerToken || !(await this.authGateway.tokenDecoding(BearerToken.split(" ")[1]))) {
       throw new HttpException(
         {

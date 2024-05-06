@@ -7,6 +7,9 @@ import { UserModel } from "@modules/auth/infra/database/models/UserModel.model";
 import { AuthModule } from "./auth/auth.module";
 import { UserModel as profileUserModel } from "@modules/profile/infra/database/models/UserModel.model";
 import { ProfileModule } from "./profile/profile.module";
+import { PostsModule } from "./posts/post.module";
+import { PostsUserModel } from "@modules/posts/infra/database/models/UserModel.model";
+import { PostModel } from "@modules/posts/infra/database/models/Post.model";
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -17,13 +20,14 @@ import { ProfileModule } from "./profile/profile.module";
       username: process.env.DB_DEFAULT_USENAME,
       schema: process.env.DB_DEFAULT_SCHEMA ?? "public",
       password: process.env.DB_DEFAULT_PASSWORD,
-      entities: [UserModel, profileUserModel],
+      entities: [UserModel, profileUserModel, PostsUserModel, PostModel],
     }),
     RabbitMQModule.forRoot(RabbitMQModule, {
       uri: process.env.RABBITMQ_URL,
     }),
     AuthModule,
     ProfileModule,
+    PostsModule,
   ],
   controllers: [AppController],
   providers: [],

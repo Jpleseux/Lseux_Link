@@ -12,6 +12,7 @@ import Index from './pages/home/index.tsx'
 import Profile from './pages/home/profile.tsx'
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
+import NewPost from './pages/home/newPost.tsx'
 const router = createBrowserRouter([
   {
     path:"/",
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
       {
         path: "profile",
         element: <Profile />
+      },
+      {
+        path: "new/post",
+        element: <NewPost />
       }
     ]
   }
