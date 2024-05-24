@@ -6,6 +6,7 @@ import { DataSource } from "typeorm";
 import { AuthorizationMiddleware } from "../middlewares/autorization.middleware";
 import { middlewareGateway } from "@modules/shared/infra/gateway/middleware.gateway";
 import { ProfileGatewayLocal } from "@modules/profile/infra/gateway/profileGatewayLocal.local";
+import { UploadImageStorageAws } from "@modules/profile/infra/storage/uploadImageStorage.aws";
 
 @Module({
   controllers: [ProfileController],
@@ -23,6 +24,13 @@ import { ProfileGatewayLocal } from "@modules/profile/infra/gateway/profileGatew
         return new middlewareGateway(dataSource);
       },
       inject: [getDataSourceToken()],
+    },
+    {
+      provide: UploadImageStorageAws,
+      useFactory: () => {
+        return new UploadImageStorageAws();
+      },
+      inject: [],
     },
     {
       provide: ProfileGatewayLocal,

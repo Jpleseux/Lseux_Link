@@ -13,7 +13,7 @@ export type changeUserInput = {
     password: string;
 }
 export interface profileGateway {
-    changeAvatar(image: string): Promise<Output>;
+    changeAvatar(image: any): Promise<Output>;
     findUserByEmail(): Promise<Output>;
     changeUser(user: changeUserInput): Promise<Output>;
     changePassword(newPassword: string): Promise<Output>;

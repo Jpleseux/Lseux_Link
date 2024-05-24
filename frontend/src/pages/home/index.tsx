@@ -1,10 +1,12 @@
-import { useContext, useEffect, useState } from "react";
+import { ChangeEvent, useContext, useEffect, useState } from "react";
 import CookieFactory from "../../utils/cookieFactory";
 import "../../../public/style/main/index.css"
 import { GatewayContext } from "../../gateway/gatewayContext";
-import { AiFillDislike, AiFillLike } from "react-icons/ai";
 import { MdGroup, MdOutlinePostAdd } from "react-icons/md";
 import { PostEntity } from "../../entities/posts/postEntity.entity";
+import ReactLoading from 'react-loading';
+import PostComponent from "../../components/posts/posts";
+
 
 export type Avatar = {
     avatar: null;
@@ -14,25 +16,32 @@ export type Avatar = {
     token: string;
     userName: string;
 }
+
 function Index() {
     const factory = new CookieFactory();
-    const [user, setUser] = useState({
+    const [user, setUser] = useState<Avatar>({
         email: '',
+        uuid: '',
         userName: '',
         avatar: '',
         phoneNumber: '',
         password: '',
-      });
+    });
     const [posts, setPosts] = useState<PostEntity[]>();
+    const [loading, setLoading] = useState(false);
     const gatewayContext = useContext(GatewayContext);
     const profileGateway = gatewayContext?.profileGateway;
     const postsGateway = gatewayContext?.postsGateway;
+    const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
+
     async function getCookie(): Promise<Avatar> {
         return await factory.getCookie("user");
     }
     async function findUser() {
+        setLoading(true);
         const response = await profileGateway?.findUserByEmail();
         setUser({
+            uuid: response?.user?.props.uuid ?? "",
             avatar: response.user.props.avatar ?? "",
             email: response.user.props.email ?? "",
             password: response.user.props.password,
@@ -42,92 +51,68 @@ function Index() {
     }
     async function findPosts() {
         const res = await postsGateway?.findPostsCreatedToday();
-        console.log(res?.posts[2].title());
-        console.log(res?.posts[2].images().length)
         if (res?.posts && res.posts?.length > 0) {
             setPosts(res.posts)
         }
+        setLoading(false)
     }
     useEffect(()=> {
         findPosts();
         getCookie();
         findUser();
     }, [])
+    function handleCloseFullscreenImage() {
+        setFullscreenImage(null);
+    }
+    function handleImageClick(imageUrl: string) {
+        setFullscreenImage(imageUrl);
+    }
 
     return (
         <div className="container">
             <div className="row">
-                <div className="col-sm-8 col-sm-offset-2">
+                <div className="col-sm-18 col-sm-offset-4">
                     <div className="panel panel profile-widget mt-4">
-                        <div className="row">
-                            <div className="col-sm-12">
-                                <div className="image-container bg2" style={{background: "url(../../../public/imgs/backgroundProfile.jpg)", width: "100%"}}>
-                                    <img src={user.avatar} className="avatar" alt="avatar" />
+                        {!loading &&
+                            <div className="row">
+                                <div className="col-sm-12">
+                                    <div className="image-container bg2" style={{background: "url(../../../public/imgs/backgroundProfile.jpg)", width: "100%"}}>
+                                        <img src={user.avatar} className="avatar" alt="avatar" onClick={() => handleImageClick(user.avatar)} style={{maxWidth: '100%', maxHeight: '100%', display: 'block'}}/>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="col-sm-12">
-                                <div className="details">
-                                    <h4>{user.userName}<i className="fa fa-sheild"></i></h4>
-                                    <div>Email: {user.email}</div>
-                                    <div className="m-4">
-                                        <a href="/home/profile" className="m-2"><button> <MdGroup /> PERFIL </button></a>
-                                        <a href="/home/new/post" ><button><MdOutlinePostAdd /> NOVA POSTAGEM </button></a>
+                                <div className="col-sm-12">
+                                    <div className="details">
+                                        <h4>{user.userName}<i className="fa fa-sheild"></i></h4>
+                                        <div>Email: {user.email}</div>
+                                        <div className="m-4">
+                                            <a href="/home/profile" className="m-2"><button> <MdGroup /> PERFIL </button></a>
+                                            <a href="/home/new/post" ><button><MdOutlinePostAdd /> NOVA POSTAGEM </button></a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            
-                        </div>
+                        }
                     </div>
-                    
                     <div className="row">
                         <div className="col-sm-12">
-                        {posts && posts.length > 0 && 
+                        {!loading && posts && posts.length > 0 &&
                             posts.map((post, index) => (
-                            <div className="panel panel-white post" key={index}>
-                                <div className="post-heading">
-                                    <div className="pull-left image">
-                                        <img src={post.user()?.avatar()} className="img-circle avatar" alt="user profile image" />
-                                    </div>
-                                    <div className="pull-right meta">
-                                        <div className="title">
-                                            <b className="">{post.user()?.userName()}</b>
-                                            Fez uma nova postagem
-                                        </div>
-                                        <h6 className="text-muted time">5 segundos atrás</h6>
-                                    </div>
-                                    <div className="clearfix"></div>
-                                </div>
-                                <div className="post-image">
-                                    <img src={post.images()} className="image" alt="image post" />
-                                </div>
-                                <div className="post-description">
-                                    <h4>{post.title()}</h4>
-                                    <p>{post.text()}</p>
-                                    <div className="stats">
-                                        <a href="javascript:void(0);" className="btn btn-default stat-item">
-                                            <AiFillLike />{post.like()}
-                                        </a>
-                                        <a href="javascript:void(0);" className="btn btn-default stat-item">
-                                            <AiFillDislike />{post.desLike()}
-                                        </a>
-                                    </div>
-                                </div>
-                                <div className="post-footer">
-                                    <div className="input-group">
-                                        <input className="form-control" placeholder="Add a comment" type="text" />
-                                        <span className="input-group-addon">
-                                            <a href="javascript:void(0);"><i className="fa fa-edit"></i></a>
-                                        </span>
-                                    </div>
-                                    <ul className="comments-list">
-                                    </ul>
-                                </div>
-                            </div>
+                                <PostComponent  key={index} post={post} user={user}/>
                             ))
+                        }
+                        {loading && 
+                            <div className="col-sm-12 d-flex justify-content-center align-items-center m-4">
+                                <ReactLoading type="spin" height={"20%"} width={ "30%" } className=""/>
+                            </div>
                         }
                         </div>
                     </div>
                 </div>
+                {fullscreenImage && (
+                    <div className="fullscreen-image-overlay" onClick={handleCloseFullscreenImage}>
+                        <img src={fullscreenImage} className="fullscreen-image" alt="Fullscreen" />
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -9,6 +9,9 @@ export class FindPostsByUserUuidUsecase {
     if (!posts || posts.length === 0) {
       throw new apiError("Nenhum post encontrado", 404, "NOT_FOUND");
     }
+    posts.map((post) => {
+      post.setAWsUrls();
+    });
     return posts;
   }
 }

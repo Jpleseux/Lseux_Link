@@ -5,12 +5,16 @@ export type userProps = {
     avatar?: string;
     password: string;
     token?: string;
+    uuid?: string;
   };
   
   export class UserEntity {
     constructor(readonly props: userProps) {}
     email(): string {
       return this.props.email;
+    }
+    uuid(): string | undefined{
+      return this.props.uuid;
     }
     avatar(): string | undefined{
       return this.props.avatar;

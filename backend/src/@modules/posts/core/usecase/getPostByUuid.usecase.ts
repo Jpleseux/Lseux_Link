@@ -13,6 +13,7 @@ export class GetPostsByUuidUsecase {
     if (!post) {
       throw new apiError("Nenhum post encontrado", 404, "not found");
     }
+    post.setAWsUrls();
     return post;
   }
 }

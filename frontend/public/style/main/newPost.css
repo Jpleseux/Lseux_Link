@@ -76,7 +76,7 @@ label small {
     justify-content: flex-end; /* Adicionado para alinhar os botões à direita */
 }
 .modal__footer button {
-    font-size: 10px;
+    font-size: 100%;
 }
 .modal__title {
     font-weight: 700;
@@ -101,7 +101,7 @@ label small {
     background-color: #006489;
 }
 
-.input {
+.input-post {
     display: flex;
     flex-direction: column;
     margin-top: 1.75rem;
@@ -153,7 +153,8 @@ label small {
   }
   
   .post_image img {
-    height: 64px;
+    height: 300px;
+    width: 100%;
     order: 1;
   }
   
@@ -183,4 +184,14 @@ label small {
     background-color: #0d3f8f;
     color: white;
   }
-  
+  @media (max-width: 768px) {
+    .modal__footer {
+      font-size: 70%; /* Reduz o tamanho do texto em telas menores */
+    }
+    .post_image {
+        width: 250%;
+    }
+    .post_image img {
+        width: 80%;
+    }
+  }

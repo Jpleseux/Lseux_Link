@@ -1,9 +1,10 @@
 import { SavePostUsecase } from "@modules/posts/core/usecase/savePost.usecase";
 import { PostsRepositoryTypeOrm } from "@modules/posts/infra/repository/postsRepository.typeOrm";
+import { StorageUploadMemory } from "@modules/posts/infra/storage/storageUploadImage.storage.memory";
 import dataSource from "@modules/shared/infra/database/datasource";
 
 let repo: PostsRepositoryTypeOrm;
-
+const storage = new StorageUploadMemory();
 describe("Deve testar o savePostUsecase", () => {
   beforeAll(async () => {
     await dataSource.initialize();
@@ -13,7 +14,7 @@ describe("Deve testar o savePostUsecase", () => {
     await dataSource.destroy();
   });
   test("Deve salvar um post de um usuario", async () => {
-    const action = new SavePostUsecase(repo);
+    const action = new SavePostUsecase(repo, storage);
     const res = await action.execute({
       images: [""],
       title: "Titulo teste",

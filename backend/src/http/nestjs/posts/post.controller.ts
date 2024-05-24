@@ -1,7 +1,19 @@
 import { PostsRepositoryTypeOrm } from "@modules/posts/infra/repository/postsRepository.typeOrm";
-import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Req, Res } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Req,
+  Res,
+  UploadedFiles,
+  UseInterceptors,
+} from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
-import { SavePostInputDto } from "./dto/savePosts.request.dto";
 import { SavePostUsecase } from "@modules/posts/core/usecase/savePost.usecase";
 import { GetPostsByUuidUsecase } from "@modules/posts/core/usecase/getPostByUuid.usecase";
 import { FindPostsByUserUuidUsecase } from "@modules/posts/core/usecase/findPostsByUserUuid.usecase";
@@ -9,21 +21,35 @@ import { FinPostsCreatedAtTodayUsecase } from "@modules/posts/core/usecase/findP
 import { UpdatePostInputDto } from "./dto/updatePosts.request.dto";
 import { updatePostUsecase } from "@modules/posts/core/usecase/updatePost.usecase";
 import { DeletePostUsecase } from "@modules/posts/core/usecase/DeletePost.usecase";
+import { SaveNewReactioRequestDto } from "./dto/saveNewReaction.request.dto";
+import { AddReactionToPostUsecase } from "@modules/posts/core/usecase/addReactionToPost.usecase";
+import { SaveCommentInPostUsecase } from "@modules/posts/core/usecase/saveCommentInPost.usecase";
+import { SaveCommentInputDto } from "./dto/saveComment.request.dto";
+import multerConfig from "@modules/shared/multer/multerConfig";
+import { FilesInterceptor } from "@nestjs/platform-express";
+import { UploadImageStorageAws } from "@modules/posts/infra/storage/uploadImageStorage.aws";
 
 @ApiTags("Posts")
 @Controller("posts")
 export class PostsController {
-  constructor(readonly repo: PostsRepositoryTypeOrm) {}
+  constructor(
+    readonly repo: PostsRepositoryTypeOrm,
+    readonly storage: UploadImageStorageAws,
+  ) {}
+  @UseInterceptors(FilesInterceptor("images", 4, multerConfig))
   @Post()
-  async savePost(@Res() res, @Req() req, @Body() body: SavePostInputDto) {
+  async savePost(@Res() res, @Req() req, @Body() body: any, @UploadedFiles() images: Express.Multer.File[]) {
+    console.log(req);
     const tokenDecoded = req["tokenPayload"];
-    const action = new SavePostUsecase(this.repo);
-    const post = await action.execute({ ...body, userUuid: tokenDecoded.uuid });
+
+    const action = new SavePostUsecase(this.repo, this.storage);
+    const post = await action.execute({ text: body.text, title: body.title, userUuid: tokenDecoded.uuid, images: images });
     res.status(HttpStatus.OK).send({
-      message: "Postagem salvo com sucesso",
+      message: "Postagem salva com sucesso",
       post: post.toOutput(),
     });
   }
+
   @Get(":uuid")
   async getPostByUuid(@Param("uuid") uuid: string, @Res() res) {
     const action = new GetPostsByUuidUsecase(this.repo);
@@ -63,6 +89,15 @@ export class PostsController {
       post: post.toOutput(),
     });
   }
+  @Patch("reaction/:uuid")
+  async setNewReaction(@Param("uuid") uuid: string, @Res() res, @Req() req, @Body() body: SaveNewReactioRequestDto) {
+    const tokenDecoded = req["tokenPayload"];
+    const action = new AddReactionToPostUsecase(this.repo);
+    await action.execute({ ...body, postUuid: uuid, userUuid: tokenDecoded.uuid });
+    res.status(HttpStatus.OK).send({
+      message: "Postagem atualizada com sucesso",
+    });
+  }
   @Delete(":uuid")
   async deletePost(@Param("uuid") uuid: string, @Res() res, @Req() req) {
     const tokenDecoded = req["tokenPayload"];
@@ -70,6 +105,16 @@ export class PostsController {
     await action.execute(uuid, tokenDecoded.uuid);
     res.status(HttpStatus.OK).send({
       message: "Postagem deletado com sucesso",
+    });
+  }
+  @Post("save/comments")
+  async saveComment(@Res() res, @Req() req, @Body() body: SaveCommentInputDto) {
+    const uuid = req["tokenPayload"]["uuid"];
+    const action = new SaveCommentInPostUsecase(this.repo);
+    const comment = await action.execute({ ...body, userUuid: uuid });
+    res.status(HttpStatus.OK).send({
+      message: "Comentario salvo com sucesso",
+      comment: comment.props,
     });
   }
 }

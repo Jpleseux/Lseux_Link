@@ -18,7 +18,6 @@ function VerifyAccount() {
       setCountdown(100);
       setMsg({msg: null, status: null});
       const response = await userGateway?.ResendEmailVerifyAccountToUser(email);
-      console.log(response);
       setLoading(true);
       setMsg({msg: response?.message, status: response?.status});
       setTimeout(() => {

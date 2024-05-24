@@ -23,12 +23,20 @@ describe("Deve testar o FinPostsCreatedAtTodayUsecase", () => {
           title: "teste",
           uuid: "84539f75-a6e7-4683-a022-8ac2f05533e9",
           user_uuid: "d0027811-4f76-4cf2-a24b-bc99ad777950",
+          des_like: {
+            amount: 0,
+            userUuids: [],
+          },
+          like: {
+            amount: 0,
+            userUuids: [],
+          },
         },
       ])
       .execute();
     const action = new DeletePostUsecase(repo);
     await action.execute("84539f75-a6e7-4683-a022-8ac2f05533e9", "d0027811-4f76-4cf2-a24b-bc99ad777950");
-    const posts = await repo.findPostsByUserUuid("d0027811-4f76-4cf2-a24b-bc99ad777950");
-    expect(posts.length).toBe(0);
+    const post = await repo.findPostByUuid("84539f75-a6e7-4683-a022-8ac2f05533e9");
+    expect(!post).toBe(true);
   });
 });

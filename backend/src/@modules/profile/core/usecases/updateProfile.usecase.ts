@@ -10,6 +10,7 @@ export class UpdateProfileUsecase {
     readonly gateway: ProfileGatewayInterface,
   ) {}
   public async execute(uuid: string, newUser: Partial<userProps>): Promise<UserEntity> {
+    delete newUser.avatar;
     const user = await this.repo.findUserByUuid(uuid);
     if (!user) {
       throw new apiError("Esse usuario não existe", 404, "NOT_FOUND");
@@ -24,6 +25,7 @@ export class UpdateProfileUsecase {
     }
     await this.repo.updateUser(uuid, newUser);
     const Output = await this.repo.findUserByUuid(uuid);
+    user.setAvatar(process.env.STORAGE_BASE_URL + Output.avatar());
     return Output;
   }
 }

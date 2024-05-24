@@ -1,5 +1,8 @@
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from "typeorm";
-
+export type reaction = {
+  amount: number;
+  userUuids: string[];
+};
 @Entity("blog_posts")
 export class PostModel {
   @PrimaryColumn("uuid")
@@ -22,8 +25,16 @@ export class PostModel {
   images?: string[];
   @Column()
   user_uuid: string;
-  @Column({ default: 0 })
-  like?: number;
-  @Column({ default: 0 })
-  des_like?: number;
+  @Column({
+    type: !!process.env.JEST_WORKER_ID ? "simple-json" : "jsonb",
+    nullable: false,
+    default: !!process.env.JEST_WORKER_ID ? "{}" : {},
+  })
+  like: reaction;
+  @Column({
+    type: !!process.env.JEST_WORKER_ID ? "simple-json" : "jsonb",
+    nullable: false,
+    default: !!process.env.JEST_WORKER_ID ? "{}" : {},
+  })
+  des_like: reaction;
 }

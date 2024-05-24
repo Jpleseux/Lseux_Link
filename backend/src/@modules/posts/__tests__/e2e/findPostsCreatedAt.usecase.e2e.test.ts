@@ -23,6 +23,14 @@ describe.skip("Deve testar o FinPostsCreatedAtTodayUsecase", () => {
           title: "teste",
           uuid: "7cb9e8a5-4736-451c-9a0d-e156a46bdce5",
           user_uuid: "d0027811-4f76-4cf2-a24b-bc99ad777950",
+          des_like: {
+            amount: 0,
+            userUuids: [],
+          },
+          like: {
+            amount: 0,
+            userUuids: [],
+          },
         },
       ])
       .execute();

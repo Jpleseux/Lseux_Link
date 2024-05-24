@@ -28,7 +28,7 @@ export class LoginUsecase {
     } else if (!(await this.gateway.userValidatePassword(user, input.password))) {
       throw new apiError("Senha Incorreta", 400, "invalid_item");
     }
-    user.setAvatar(null);
+    user.setAvatar(process.env.STORAGE_BASE_URL + user.avatar());
     return { token: await this.gateway.tokenGenerate(user), user: user };
   }
 }

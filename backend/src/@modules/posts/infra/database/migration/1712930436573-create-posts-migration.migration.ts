@@ -42,13 +42,11 @@ export class CreatePostsMigration1712930436573 implements MigrationInterface {
           },
           {
             name: "like",
-            default: 0,
-            type: "integer",
+            type: "jsonb",
           },
           {
             name: "des_like",
-            default: 0,
-            type: "integer",
+            type: "jsonb",
           },
           {
             name: "images",

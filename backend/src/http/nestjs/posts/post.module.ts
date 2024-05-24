@@ -5,6 +5,7 @@ import { PostsRepositoryTypeOrm } from "@modules/posts/infra/repository/postsRep
 import { DataSource } from "typeorm";
 import { getDataSourceToken } from "@nestjs/typeorm";
 import { middlewareGateway } from "@modules/shared/infra/gateway/middleware.gateway";
+import { UploadImageStorageAws } from "@modules/posts/infra/storage/uploadImageStorage.aws";
 
 @Module({
   controllers: [PostsController],
@@ -22,6 +23,13 @@ import { middlewareGateway } from "@modules/shared/infra/gateway/middleware.gate
         return new middlewareGateway(dataSource);
       },
       inject: [getDataSourceToken()],
+    },
+    {
+      provide: UploadImageStorageAws,
+      useFactory: () => {
+        return new UploadImageStorageAws();
+      },
+      inject: [],
     },
   ],
 })

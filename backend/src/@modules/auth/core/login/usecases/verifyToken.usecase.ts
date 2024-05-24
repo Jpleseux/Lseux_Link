@@ -14,6 +14,7 @@ export class VerifyToken {
     if (!user) {
       throw new apiError("Usuario não encontrado", 404, "NOT_FOUND");
     }
+    user.setAvatar(process.env.STORAGE_BASE_URL + user.avatar());
     return user;
   }
 }

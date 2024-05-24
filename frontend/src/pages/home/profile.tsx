@@ -3,7 +3,7 @@ import "../../../public/style/profile/profile.css";
 import { ChangeEvent, FormEvent, useContext, useEffect, useState } from 'react';
 import { GatewayContext } from '../../gateway/gatewayContext';
 import Message from '../../components/visual/Message.component';
-import Loader from '../../components/visual/Loader';
+import ReactLoading from 'react-loading';
 
 enum Tab {
   General = "account-general",
@@ -34,20 +34,14 @@ function Profile() {
   };
 
   const getUser = async () => {
+    setLoading(true);
     const response = await profileGateway?.findUserByEmail();
-    setUser({
-      avatar: response.user.props.avatar,
-      email: response.user.props.email,
-      password: response.user.props.password,
-      userName: response.user.props.userName,
-      phone_number: response.user.props.phone_number,
-    });
-    setOriginalUser({
-      avatar: response.user.props.avatar,
-      email: response.user.props.email,
-      userName: response.user.props.userName,
-      phone_number: response.user.props.phone_number,
-    });
+    if (response?.user?.props) {
+      const { avatar, email, password, userName, phone_number } = response.user.props;
+      setUser({ avatar, email, password, userName, phone_number });
+      setOriginalUser({ avatar, email, userName, phone_number });
+    }
+    setLoading(false);
   };
 
   const cancelEdit = () => {
@@ -55,63 +49,53 @@ function Profile() {
     setEdit(false);
   };
 
-  const handleOnImage = async (e: any) => {
-    const file = e.target.files[0];
-
+  const handleOnImage = async (e: ChangeEvent<HTMLInputElement>) => {
+    setLoading(true);
+    const file = e.target.files?.[0];
     if (file) {
-      if (file.type.startsWith('image/jpeg') || file.type.startsWith('image/png')) {
-        const reader = new FileReader();
-        reader.onload = async (event) => {
-          const image64 = event.target?.result;
-          setUser((prevUser) => ({
-            ...prevUser,
-            avatar: image64,
-          }));
-          await profileGateway?.changeAvatar(image64);
-        };
-        reader.readAsDataURL(file);
+      const response = await profileGateway?.changeAvatar(file);
+      if (response?.user?.avatar()) {
+        setUser(response.user.props);
       }
     }
+    setLoading(false);
   };
 
-  const changeUser = async (e: FormEvent<HTMLFormElement>) => {
-    setMsg({msg: null, status: null});
-    e.preventDefault();
+  const changeUser = async () => {
+    setMsg({ msg: null, status: null });
     setLoading(true);
     const response = await profileGateway?.changeUser(user);
     setMsg({ msg: response?.message, status: response?.status });
-    if (response?.status < 300) {
-      setTimeout(() => {
-        window.location.reload();
-      }, 3000);
-    }
     setLoading(false);
+    setEdit(false)
   };
 
   const handleOnChangeUpdateUser = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setUser((prevState) => ({ ...prevState, [name]: value }));
   };
-  async function handleOnChangeRecoveryPassword(e: ChangeEvent<HTMLInputElement>) {
-    const { value, name} = e.target;
+
+  const handleOnChangeRecoveryPassword = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
     if (name === "confirm-password") {
-        setConfirmPassword(value);
+      setConfirmPassword(value);
     } else {
-        setNewPassword(value)
+      setNewPassword(value);
     }
-  }
-  async function ChangePassword(e: FormEvent<HTMLFormElement>) {
-    setMsg({msg: null, status: null});
-    e.preventDefault();
+  };
+
+  const changePassword = async () => {
+    setMsg({ msg: null, status: null });
     setLoading(true);
     if (newPassword !== confirmPassword) {
-        setMsg({msg: "As senhas não são iguais", status: 400})
+      setMsg({ msg: "As senhas não são iguais", status: 400 });
     } else {
-        const response = await profileGateway?.changePassword(newPassword);
-        setMsg({ msg: response?.message, status: response?.status });
+      const response = await profileGateway?.changePassword(newPassword);
+      setMsg({ msg: response?.message, status: response?.status });
     }
     setLoading(false);
-  }
+  };
+
   useEffect(() => {
     getUser();
   }, []);
@@ -119,9 +103,7 @@ function Profile() {
   return (
     <div className="container light-style flex-grow-1 container-p-y">
       {msg.msg && <Message msg={msg.msg} status={msg.status} timers={3000} />}
-      <h4 className="font-weight-bold py-3 mb-4">
-        Configurações de conta
-      </h4>
+      <h4 className="font-weight-bold py-3 mb-4">Configurações de conta</h4>
       <div className="card overflow-hidden">
         <div className="row no-gutters row-bordered row-border-light">
           <div className="col-md-3 pt-0">
@@ -141,72 +123,113 @@ function Profile() {
             </div>
           </div>
           <div className="col-md-9">
-            {loading && <Loader />}
             <div className="tab-content">
-              <div className={`tab-pane fade ${activeTab === Tab.General ? "show active" : ""}`} id={Tab.General}>
-                <div className="card-body media align-items-center">
-                  {user.avatar && <img src={user.avatar} alt="" className="d-block ui-w-80 m-2" />}
-                  {!user.avatar && <img src="../../../public/imgs/icon_avatar.png" alt="" className="d-block ui-w-80 m-2" />}
-                  <div className="media-body ml-4">
-                    <label className="btn btn-outline-primary">
-                      Mudar foto
-                      <input type="file" className="account-settings-fileinput" onChange={handleOnImage} accept=".jpg, .jpeg, .png" />
-                    </label>{" "}
-                    &nbsp;
-                    <div className="text-light small mt-1">Aceito: JPG, JPEG or PNG. Tamanho máximo 800Kb</div>
-                  </div>
-                </div>
-                <hr className="border-light m-0" />
-                <form onSubmit={changeUser}>
-                  <div className="card-body">
-                    <div className="form-group">
-                      <label className="form-label">Nome</label>
-                      <input type="text" className="form-control mb-1" name='userName' value={user.userName} onChange={handleOnChangeUpdateUser} disabled={!edit} />
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">Número de telefone</label>
-                      <input type="text" className="form-control mb-1" name='phone_number' value={user.phone_number} onChange={handleOnChangeUpdateUser} disabled={!edit} />
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">E-mail</label>
-                      <input type="text" className="form-control mb-1" name='email' value={user.email} onChange={handleOnChangeUpdateUser} disabled={!edit} />
+              {!loading && (
+                <div className={`tab-pane fade ${activeTab === Tab.General ? "show active" : ""}`} id={Tab.General}>
+                  <div className="card-body media align-items-center">
+                    {user.avatar ? (
+                      <img src={user.avatar} alt="" className="d-block ui-w-80 m-2" />
+                    ) : (
+                      <img src="../../../public/imgs/icon_avatar.png" alt="" className="d-block ui-w-80 m-2" />
+                    )}
+                    <div className="media-body ml-4">
+                      <label className="btn btn-outline-primary">
+                        Mudar foto
+                        <input
+                          type="file"
+                          className="account-settings-fileinput"
+                          onChange={handleOnImage}
+                          accept=".jpg, .jpeg, .png"
+                        />
+                      </label>
+                      <div className="text-light small mt-1">
+                        Aceito: JPG, JPEG or PNG. Tamanho máximo 800Kb
+                      </div>
                     </div>
                   </div>
-                  {edit === false &&
-                    <div className="text-center m-4">
-                      <button type="button" onClick={() => setEdit(true)} className="btn btn-primary">Editar</button>
+                  <hr className="border-light m-0" />
+                  <form>
+                    <div className="card-body">
+                      <div className="form-group">
+                        <label className="form-label">Nome</label>
+                        <input
+                          type="text"
+                          className="form-control mb-1"
+                          name="userName"
+                          value={user.userName}
+                          onChange={handleOnChangeUpdateUser}
+                          disabled={!edit}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Número de telefone</label>
+                        <input
+                          type="text"
+                          className="form-control mb-1"
+                          name="phone_number"
+                          value={user.phone_number}
+                          onChange={handleOnChangeUpdateUser}
+                          disabled={!edit}
+                        />
+                      </div>
                     </div>
-                  }
-                  {edit === true &&
-                    <div className="text-center m-4">
-                      <button type="submit" className="btn btn-primary">Salvar alterações</button>{" "}
-                      &nbsp;
-                      <button type="button" className="btn btn-default" onClick={cancelEdit}>Cancelar</button>
-                    </div>
-                  }
-                </form>
-              </div>
-              <div className={`tab-pane fade ${activeTab === Tab.ChangePassword ? "show active" : ""}`} id={Tab.ChangePassword}>
-                  <form onSubmit={ChangePassword}>
-                    <div className="card-body pb-2">
-                    <div className="form-group">
-                        <label className="form-label">Nova senha</label>
-                        <input name='password' type="password" className="form-control" onChange={handleOnChangeRecoveryPassword}/>
-                    </div>
-                    <div className="form-group">
-                        <label className="form-label">Repita a nova senha</label>
-                        <input name='confirm-password' type="password" className="form-control" onChange={handleOnChangeRecoveryPassword}/>
-                    </div>
-                    </div>
-                    <div className="text-center m-4">
-                        <button type="submit" className="btn btn-primary m-2">Mudar Senha</button>
-                    </div>
+                    {edit === false ? (
+                      <div className="text-center m-4">
+                        <button type="button" onClick={() => setEdit(true)} className="btn btn-primary">
+                          Editar
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="text-center m-4">
+                        <button type="button" className="btn btn-primary" onClick={changeUser}>
+                          Salvar alterações
+                        </button>
+                        <button type="button" className="btn btn-default" onClick={cancelEdit}>
+                          Cancelar
+                        </button>
+                      </div>
+                    )}
                   </form>
+                </div>
+              )}
+              <div className={`tab-pane fade ${activeTab === Tab.ChangePassword ? "show active" : ""}`} id={Tab.ChangePassword}>
+                <form onSubmit={changePassword}>
+                  <div className="card-body pb-2">
+                    <div className="form-group">
+                      <label className="form-label">Nova senha</label>
+                      <input
+                        name="password"
+                        type="password"
+                        className="form-control"
+                        onChange={handleOnChangeRecoveryPassword}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Repita a nova senha</label>
+                      <input
+                        name="confirm-password"
+                        type="password"
+                        className="form-control"
+                        onChange={handleOnChangeRecoveryPassword}
+                      />
+                    </div>
+                  </div>
+                  <div className="text-center m-4">
+                    <button type="submit" className="btn btn-primary m-2">
+                      Mudar Senha
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
         </div>
       </div>
+      {loading && (
+        <div className="col-sm-12 d-flex justify-content-center align-items-center m-4">
+          <ReactLoading type="spokes" height={"20%"} width={"30%"} />
+        </div>
+      )}
     </div>
   );
 }

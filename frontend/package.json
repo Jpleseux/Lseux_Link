@@ -21,6 +21,8 @@
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
     "react-icons": "^4.10.1",
+    "react-loading": "^2.0.3",
+    "react-read-more-read-less": "^1.0.7",
     "react-router": "^6.21.3",
     "react-router-dom": "^6.21.3",
     "universal-cookie": "^7.0.2"

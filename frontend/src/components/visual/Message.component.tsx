@@ -13,6 +13,8 @@ function Message({msg, status, timers}:any) {
             setVisible(true)
             const timer = setTimeout(()=>{
                 setVisible(false)
+                msg = null;
+                status = null;
             }, timers)
             return()=>clearTimeout(timer)
     }, [msg])
