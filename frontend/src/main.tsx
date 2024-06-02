@@ -13,6 +13,8 @@ import Profile from './pages/home/profile.tsx'
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
 import NewPost from './pages/home/newPost.tsx'
+import Contacts from './pages/messages/contacts/contacts.tsx'
+import AddContact from './pages/messages/contacts/addContact.tsx'
 const router = createBrowserRouter([
   {
     path:"/",
@@ -47,6 +49,14 @@ const router = createBrowserRouter([
       {
         path: "new/post",
         element: <NewPost />
+      },
+      {
+        path: "contacts",
+        element: <Contacts />
+      },
+      {
+        path: "contacts/add",
+        element: <AddContact />
       }
     ]
   }

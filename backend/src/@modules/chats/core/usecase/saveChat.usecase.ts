@@ -17,6 +17,7 @@ export class SaveChatUsecase {
       type: input.type,
       uuid: randomUUID(),
       users: [user],
+      messages: [],
     });
     input.users.map(async (user) => {
       const res = await this.repo.findUserByUuid(user);

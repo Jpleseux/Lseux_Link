@@ -6,10 +6,15 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { AuthModule } from "./http/nestjs/auth/auth.module";
 import { ProfileModule } from "./http/nestjs/profile/profile.module";
 import { PostsModule } from "./http/nestjs/posts/post.module";
+import { ChatsModule } from "./http/nestjs/chats/chats.module";
+import { NestExpressApplication } from "@nestjs/platform-express";
+import { apiReference } from "@scalar/nestjs-api-reference";
 require("dotenv").config();
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    rawBody: true,
+  });
   const corsOptions = {
     origin: process.env.FRONTEND_URL,
     methods: "*",
@@ -28,6 +33,7 @@ async function bootstrap() {
     .addTag("Auth")
     .addTag("Profile")
     .addTag("Posts")
+    .addTag("Chats")
     .build();
 
   swaggerConfig.security = [{ bearerAuth: [] }];
@@ -42,10 +48,19 @@ async function bootstrap() {
   };
 
   const swaggerDoc = SwaggerModule.createDocument(app, swaggerConfig, {
-    include: [ProfileModule, AuthModule, PostsModule],
+    include: [ProfileModule, AuthModule, PostsModule, ChatsModule],
   });
-
-  SwaggerModule.setup("doc", app, swaggerDoc);
+  app.use(
+    "/doc",
+    apiReference({
+      spec: {
+        content: swaggerDoc,
+      },
+      darkMode: true,
+      baseServerURL: process.env.PORT,
+      theme: "kepler",
+    }),
+  );
   await app.listen(3000);
 }
 

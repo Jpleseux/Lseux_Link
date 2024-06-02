@@ -4,8 +4,8 @@ import NavBar from "./components/navbar/navbar";
 function Home() {
   return (
     <>
-      <Outlet/>
       <NavBar />
+      <Outlet/>
     </>
   )
 }

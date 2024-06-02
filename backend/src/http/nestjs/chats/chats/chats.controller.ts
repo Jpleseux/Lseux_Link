@@ -10,11 +10,16 @@ import { UpdateChatUsecase } from "@modules/chats/core/usecase/updateChat.usecas
 import { DeleteChateUsecase } from "@modules/chats/core/usecase/deleteChat.usecase";
 import { AddUserToChatUsecase } from "@modules/chats/core/usecase/addUserToChat.usecase";
 import { AddNewChatUserInputRequestDto } from "./dto/addNewUserChat.request.dto";
+import { searchNewContactsUsecase } from "@modules/messages/core/usecase/searchNewContacts.usecase";
+import { MessagesRepositoryTypeOrm } from "@modules/messages/infra/orm/messagesRepository.typeOrm";
 
 @ApiTags("Chats")
 @Controller("chats")
 export class ChatsController {
-  constructor(readonly repo: ChatRepositoryTypeOrm) {}
+  constructor(
+    readonly repo: ChatRepositoryTypeOrm,
+    readonly messageRepo: MessagesRepositoryTypeOrm,
+  ) {}
   @Post()
   async saveChat(@Body() body: SaveEntityInputDto, @Req() req, @Res() res) {
     const tokenDecoded = req["tokenPayload"];
@@ -30,6 +35,15 @@ export class ChatsController {
     const chat = await new FindChatByUuidUsecase(this.repo).execute(uuid, tokenDecoded.uuid);
     res.status(HttpStatus.OK).send({
       chat: chat.toOutput(),
+    });
+  }
+  @Get("/user/:query")
+  async SearchNewContacts(@Param("query") query: string, @Res() res) {
+    const users = await new searchNewContactsUsecase(this.messageRepo).execute(query);
+    res.status(HttpStatus.OK).send({
+      users: users.map((user) => {
+        return user.props;
+      }),
     });
   }
   @Get()

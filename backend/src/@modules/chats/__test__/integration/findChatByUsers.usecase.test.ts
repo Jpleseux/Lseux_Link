@@ -1,5 +1,5 @@
 import { ChatsModel } from "@modules/chats/infra/database/models/chats.model";
-import { UserModel } from "@modules/chats/infra/database/models/UserModel.model";
+import { ChatsUserModel } from "@modules/chats/infra/database/models/UserModel.model";
 import { ChatRepositoryTypeOrm } from "@modules/chats/infra/orm/chatRepository.typeOrm";
 import dataSource from "@modules/shared/infra/database/datasource";
 
@@ -24,7 +24,7 @@ async function SaveData() {
   await dataSource
     .createQueryBuilder()
     .insert()
-    .into(UserModel)
+    .into(ChatsUserModel)
     .values([
       {
         avatar: "jiodrfjidfbfgbuv",
@@ -55,7 +55,7 @@ async function DeleteData() {
   await dataSource
     .createQueryBuilder()
     .delete()
-    .from(UserModel)
+    .from(ChatsUserModel)
     .where("uuid = :userUuid", { userUuid: "26b2240d-2a2d-4a46-9626-9d1b85898042" })
     .execute();
   await dataSource

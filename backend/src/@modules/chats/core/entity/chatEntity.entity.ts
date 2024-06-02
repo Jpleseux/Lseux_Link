@@ -1,3 +1,4 @@
+import { MessageEntity } from "@modules/messages/core/entities/messageEntity.entity";
 import { apiError } from "../../../../http/nestjs/helpers/api-Error.helper";
 import { UserEntity } from "./user.entity";
 
@@ -5,6 +6,7 @@ export type ChatEntityProps = {
   uuid: string;
   name: string;
   type: string;
+  messages: MessageEntity[];
   users: UserEntity[];
 };
 export class ChatEntity {
@@ -17,6 +19,9 @@ export class ChatEntity {
   }
   name(): string {
     return this.props.name;
+  }
+  messages(): MessageEntity[] {
+    return this.props.messages;
   }
   users(): UserEntity[] {
     return this.props.users;
@@ -38,6 +43,9 @@ export class ChatEntity {
       type: this.props.type,
       users: this.users().map((user) => {
         return user.props;
+      }),
+      messages: this.messages().map((message) => {
+        return message.toOutput();
       }),
     };
   }

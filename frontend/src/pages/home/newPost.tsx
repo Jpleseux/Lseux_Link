@@ -61,27 +61,30 @@ function NewPost() {
 
   async function submit() {
     setMsg({ msg: null, status: null });
-  
-    const formData = new FormData();
-    formData.append('title', post.title());
-    formData.append('text', post.text());
-    images.forEach((image) => {
-      formData.append(`images`, image);
-    });
-    const response = await postsGateway?.save(formData);
-  
-    setMsg({ msg: response?.message, status: response?.status });
-  
-    if (response?.status < 300) {
-      setTimeout(() => {
-        window.location.href = "/home/index";
-      }, 3000);
+    if (!post.props) {
+      setMsg({msg: "Deve existir um titulo e texto válido", status: 400})
+    } else {  
+      const formData = new FormData();
+      formData.append('title', post.title() ?? null);
+      formData.append('text', post.text() ?? null);
+      images.forEach((image) => {
+        formData.append(`images`, image);
+      });
+      const response = await postsGateway?.save(formData);
+    
+      setMsg({ msg: response?.message, status: response?.status });
+    
+      if (response?.status < 300) {
+        setTimeout(() => {
+          window.location.href = "/home/index";
+        }, 3000);
+      }
     }
   }
   
 
   return (
-    <div className="modal">
+    <div className="newpost">
       {msg.msg && <Message msg={msg.msg} status={msg.status} timers={3000} />}
       <div className="modal__header">
         <span className="modal__title">Nova Postagem</span>
@@ -105,12 +108,12 @@ function NewPost() {
               multiple
               onChange={handleOnImage} />
             <div className="preview">
-              {imagePreviews.map((image, index) => (
+            {imagePreviews.map((image, index) => (
                 <div key={index} className="image-preview">
-                  <img src={image} alt={`Image ${index}`} />
-                  <button onClick={() => removeImage(index)}>Excluir</button>
+                    <img src={image} alt={`Image ${index}`} />
+                    <button onClick={() => removeImage(index)}>Excluir</button>
                 </div>
-              ))}
+            ))}
             </div>
           </div>
         </div>

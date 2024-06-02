@@ -1,6 +1,6 @@
 import { SaveChatUsecase } from "@modules/chats/core/usecase/saveChat.usecase";
 import { ChatsModel } from "@modules/chats/infra/database/models/chats.model";
-import { UserModel } from "@modules/chats/infra/database/models/UserModel.model";
+import { ChatsUserModel } from "@modules/chats/infra/database/models/UserModel.model";
 import { ChatRepositoryTypeOrm } from "@modules/chats/infra/orm/chatRepository.typeOrm";
 import dataSource from "@modules/shared/infra/database/datasource";
 
@@ -31,7 +31,7 @@ async function SaveData() {
   await dataSource
     .createQueryBuilder()
     .insert()
-    .into(UserModel)
+    .into(ChatsUserModel)
     .values([
       {
         avatar: "jiodrfjidfbfgbuv",
@@ -49,7 +49,7 @@ async function DeleteData() {
   await dataSource
     .createQueryBuilder()
     .delete()
-    .from(UserModel)
+    .from(ChatsUserModel)
     .where("uuid = :userUuid", { userUuid: "29373e6f-bc2a-4304-9cb1-57c60cd88750" })
     .execute();
 }
