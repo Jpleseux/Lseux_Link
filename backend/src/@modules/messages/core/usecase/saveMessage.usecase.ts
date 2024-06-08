@@ -16,9 +16,10 @@ export class SaveMessageUsecase {
   public async execute(input: saveMessageInput): Promise<MessageEntity> {
     const user = await this.repo.findUserById(input.senderUuid);
     const chat = await this.repo.findChatByUuid(input.chatUuid);
+    const contact = await this.repo.findContactByUuid(input.chatUuid);
     if (!user) {
       throw new apiError("Uusuario não encontrado", 404, "not_found");
-    } else if (!chat) {
+    } else if (!chat && !contact) {
       throw new apiError("Chat não encontrado", 404, "not_found");
     }
     const message = new MessageEntity({

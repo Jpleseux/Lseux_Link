@@ -10,13 +10,20 @@ import { PostsModule } from "./posts/post.module";
 import { PostsUserModel } from "@modules/posts/infra/database/models/UserModel.model";
 import { PostModel } from "@modules/posts/infra/database/models/Post.model";
 import { CommentsModel } from "@modules/posts/infra/database/models/comments.model";
-import { ChatsModule } from "./chats/chats.module";
+import { ChatsModule } from "./blogs/chats.module";
 import { SocketConnection } from "@modules/shared/socket/socketConnection";
 import { ChatsModel } from "@modules/chats/infra/database/models/chats.model";
 import { MessageModel } from "@modules/messages/infra/database/models/MessageModel.model";
 import { MessagesUserModel } from "@modules/messages/infra/database/models/UserModel.model";
 import { ChatsMessageModel } from "@modules/chats/infra/database/models/MessageModel.model";
 import { ChatsUserModel } from "@modules/chats/infra/database/models/UserModel.model";
+import { ContactsModel } from "@modules/contacts/infra/database/models/contactModel.model";
+import { ContactsUserModel } from "@modules/contacts/infra/database/models/UserModel.model";
+import { ContactsMessageModel } from "@modules/contacts/infra/database/models/MessageModel.model";
+import { NotificationModule } from "./notifications/notification.module";
+import { NotificationsModel } from "@modules/notifications/infra/database/models/notification.model";
+import { NotificationUserModel } from "@modules/notifications/infra/database/models/UserModel.model";
+import { MessagesContactModel } from "@modules/messages/infra/database/models/contactModel.model";
 @Global()
 @Module({
   imports: [
@@ -37,14 +44,21 @@ import { ChatsUserModel } from "@modules/chats/infra/database/models/UserModel.m
         ChatsModel,
         MessageModel,
         MessagesUserModel,
+        MessagesContactModel,
         ChatsMessageModel,
         ChatsUserModel,
+        ContactsModel,
+        ContactsUserModel,
+        ContactsMessageModel,
+        NotificationsModel,
+        NotificationUserModel,
       ],
     }),
     RabbitMQModule.forRoot(RabbitMQModule, {
       uri: process.env.RABBITMQ_URL,
     }),
     AuthModule,
+    NotificationModule,
     ProfileModule,
     PostsModule,
     ChatsModule,

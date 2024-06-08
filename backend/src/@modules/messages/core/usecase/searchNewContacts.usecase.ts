@@ -3,7 +3,7 @@ import { MessagesRepositoryInterface } from "../messagesRepository.interface";
 
 export class searchNewContactsUsecase {
   constructor(readonly repo: MessagesRepositoryInterface) {}
-  public async execute(search: string): Promise<UserEntity[]> {
-    return this.repo.searchNewContacts(search);
+  public async execute(search: string, uuid: string): Promise<UserEntity[]> {
+    return this.repo.searchNewContacts(search, uuid);
   }
 }

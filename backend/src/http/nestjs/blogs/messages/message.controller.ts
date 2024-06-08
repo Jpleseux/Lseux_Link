@@ -21,10 +21,10 @@ export class MessagesController {
       messages: message.toOutput(),
     });
   }
-  @Delete()
+  @Delete(":uuid")
   async DeleteMessages(@Res() res, @Req() req, @Param("uuid") uuid: string) {
     const tokenDecoded = req["tokenPayload"];
-    await new DeleteMessageUsecase(this.repo).execute(uuid, tokenDecoded.uuid);
+    await new DeleteMessageUsecase(this.repo, this.socket).execute(uuid, tokenDecoded.uuid);
     res.status(HttpStatus.OK).send({
       message: "Mensagem deletado com sucesso",
     });

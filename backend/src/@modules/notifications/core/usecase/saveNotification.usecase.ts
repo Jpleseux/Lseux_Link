@@ -26,6 +26,7 @@ export class SaveNotificationUsecase {
       isInvite: input.invite ?? false,
       isReaded: false,
       message: input.message,
+      from: (await this.repo.findUserByUuid(input.from)) ?? null,
       to: users,
       type: input.type,
       uuid: randomUUID(),

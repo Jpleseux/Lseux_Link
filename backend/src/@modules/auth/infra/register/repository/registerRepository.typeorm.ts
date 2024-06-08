@@ -16,6 +16,7 @@ export class RegisterRepositoryTypeOrm implements RegisterRepositoryInterface {
           password: user.password(),
           phone_number: user.phone_number(),
           userName: user.userName(),
+          avatar: "profile/user.png",
           uuid: user.uuid(),
         },
       ])

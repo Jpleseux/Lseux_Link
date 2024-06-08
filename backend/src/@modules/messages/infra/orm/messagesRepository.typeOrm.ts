@@ -6,6 +6,8 @@ import { MessageEntity } from "@modules/messages/core/entities/messageEntity.ent
 import { MessageModel } from "../database/models/MessageModel.model";
 import { ChatEntity } from "@modules/chats/core/entity/chatEntity.entity";
 import { ChatsModel } from "@modules/chats/infra/database/models/chats.model";
+import { ContactEntity } from "@modules/contacts/core/entities/contacts.entity";
+import { MessagesContactModel } from "../database/models/contactModel.model";
 
 export class MessagesRepositoryTypeOrm implements MessagesRepositoryInterface {
   constructor(readonly dataSource: DataSource) {}
@@ -18,11 +20,13 @@ export class MessagesRepositoryTypeOrm implements MessagesRepositoryInterface {
     if (!userDb) {
       return;
     }
-    return new UserEntity({
+    const userEn = new UserEntity({
       userName: userDb.userName,
       uuid: userDb.uuid,
       avatar: userDb.avatar,
     });
+    userEn.setAvatar(process.env.STORAGE_BASE_URL + userDb.avatar);
+    return userEn;
   }
   async findChatByUuid(uuid: string): Promise<ChatEntity> {
     const chatDb = await this.dataSource
@@ -79,22 +83,64 @@ export class MessagesRepositoryTypeOrm implements MessagesRepositoryInterface {
       text: messageDB.message,
     });
   }
-  async searchNewContacts(search: string): Promise<UserEntity[]> {
+  async searchNewContacts(search: string, actualUser: string): Promise<UserEntity[]> {
     const users = await this.dataSource
       .getRepository(MessagesUserModel)
       .createQueryBuilder("user")
-      .where("user.userName ILIKE :query", { query: `%${search}%` })
-      .orWhere("user.email ILIKE :query", { query: `%${search}%` })
+      .where("(user.userName ILIKE :query OR user.email ILIKE :query) AND user.uuid != :uuid", {
+        query: `%${search}%`,
+        uuid: actualUser,
+      })
       .getMany();
-    if (!users || (users && users.length === 0)) {
+
+    if (!users || users.length === 0) {
       return [];
     }
-    return users.map((user) => {
-      return new UserEntity({
-        userName: user.userName,
-        uuid: user.uuid,
-        avatar: process.env.STORAGE_BASE_URL + user.avatar,
-      });
+
+    return users.map(
+      (user) =>
+        new UserEntity({
+          userName: user.userName,
+          uuid: user.uuid,
+          avatar: `${process.env.STORAGE_BASE_URL}${user.avatar}`,
+        }),
+    );
+  }
+  private async FindMessagesByChat(uuid: string): Promise<MessageEntity[]> {
+    const messagesDb = await this.dataSource
+      .getRepository(MessageModel)
+      .createQueryBuilder()
+      .where("chat_uuid = :uuid", { uuid: uuid })
+      .orderBy("created_at")
+      .getMany();
+    if (!messagesDb || (messagesDb && messagesDb.length === 0)) {
+      return [];
+    }
+    return await Promise.all(
+      messagesDb.map(async (message) => {
+        return new MessageEntity({
+          chatUuid: message.chat_uuid,
+          sender: await this.findUserById(message.sender_uuid),
+          text: message.message,
+          uuid: message.uuid,
+        });
+      }),
+    );
+  }
+  async findContactByUuid(uuid: string): Promise<ContactEntity> {
+    const contact = await this.dataSource
+      .getRepository(MessagesContactModel)
+      .createQueryBuilder()
+      .where("uuid = :uuid", { uuid: uuid })
+      .getOne();
+    if (!contact) {
+      return;
+    }
+    return new ContactEntity({
+      firstUser: await this.findUserById(contact.first_user),
+      secondUser: await this.findUserById(contact.second_user),
+      uuid: contact.uuid,
+      messages: await this.FindMessagesByChat(contact.uuid),
     });
   }
 }

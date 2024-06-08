@@ -3,6 +3,5 @@ import { MessageEntity } from "@modules/messages/core/entities/messageEntity.ent
 
 export class ChatSocketMemory implements ChatsSocketInterface {
   async sendMessage(input: MessageEntity): Promise<void> {}
-
-  async sendPorcentMailLote(input: any): Promise<void> {}
+  async deleteMessage(uuid: string): Promise<void> {}
 }

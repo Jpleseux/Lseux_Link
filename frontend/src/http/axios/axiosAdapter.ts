@@ -70,8 +70,8 @@ export default class AxiosAdapter implements httpClient {
       }));
   }
 
-  async delete(url: string) {
-    const { data } = await axios.delete(`${baseUrl}${url}`, {
+  async delete(url: string, id: string) {
+    const data = await axios.delete(`${baseUrl}${url}/${id}`, {
       headers: await this.getHeaders(),
     });
     return data;

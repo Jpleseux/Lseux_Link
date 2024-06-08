@@ -9,9 +9,11 @@ import { ChatsSocketLocal } from "@modules/messages/infra/socket/chatsSocket.loc
 import { SocketConnection } from "@modules/shared/socket/socketConnection";
 import { MessagesRepositoryTypeOrm } from "@modules/messages/infra/orm/messagesRepository.typeOrm";
 import { MessagesController } from "./messages/message.controller";
+import { ContactsRepositoryTypeOrm } from "@modules/contacts/infra/orm/contactsRepository.typeOrm";
+import { ContactsController } from "./contacts/contacts.controller";
 
 @Module({
-  controllers: [ChatsController, MessagesController],
+  controllers: [ChatsController, MessagesController, ContactsController],
   providers: [
     {
       provide: ChatRepositoryTypeOrm,
@@ -41,11 +43,19 @@ import { MessagesController } from "./messages/message.controller";
       },
       inject: [getDataSourceToken()],
     },
+    {
+      provide: ContactsRepositoryTypeOrm,
+      useFactory: (dataSource: DataSource) => {
+        return new ContactsRepositoryTypeOrm(dataSource);
+      },
+      inject: [getDataSourceToken()],
+    },
   ],
 })
 export class ChatsModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(AuthorizationMiddleware).forRoutes("chats");
     consumer.apply(AuthorizationMiddleware).forRoutes("messages");
+    consumer.apply(AuthorizationMiddleware).forRoutes("contacts");
   }
 }

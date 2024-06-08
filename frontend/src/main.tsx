@@ -15,6 +15,7 @@ import "bootstrap/dist/js/bootstrap.bundle.min";
 import NewPost from './pages/home/newPost.tsx'
 import Contacts from './pages/messages/contacts/contacts.tsx'
 import AddContact from './pages/messages/contacts/addContact.tsx'
+import Notifications from './pages/notifications/index.tsx'
 const router = createBrowserRouter([
   {
     path:"/",
@@ -57,6 +58,10 @@ const router = createBrowserRouter([
       {
         path: "contacts/add",
         element: <AddContact />
+      },
+      {
+        path: "notifications",
+        element: <Notifications />
       }
     ]
   }

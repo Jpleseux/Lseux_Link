@@ -10,14 +10,19 @@ export class ConnectUserUsecase {
     const secondUser = await this.repo.findUserByUuid(second_user);
     if (!firstUser) {
       throw new apiError("Usuario não encontrado", 404, "NOT_FOUND");
-    } else if (secondUser) {
+    } else if (!secondUser) {
       throw new apiError("Usuario não encontrado", 404, "NOT_FOUND");
     }
     const contact = new ContactEntity({
       firstUser: firstUser,
       secondUser: secondUser,
+      messages: [],
       uuid: randomUUID(),
     });
+    const existing = await this.repo.findUnityContact(contact);
+    if (existing) {
+      throw new apiError("Esse contato ja existe", 400, "ALREADY_EXIST");
+    }
     await this.repo.connect(contact);
     return contact;
   }

@@ -41,6 +41,7 @@ export class ChatRepositoryTypeOrm implements ChatRepositoryInterface {
       avatar: user.avatar,
     });
     userEn.setAvatar(process.env.STORAGE_BASE_URL + user.avatar);
+    return userEn;
   }
   async findChatByUuid(uuid: string): Promise<ChatEntity> {
     const chat = await this.dataSource
@@ -97,6 +98,7 @@ export class ChatRepositoryTypeOrm implements ChatRepositoryInterface {
       .getRepository(ChatsMessageModel)
       .createQueryBuilder()
       .where("chat_uuid = :uuid", { uuid: uuid })
+      .orderBy("created_at")
       .getMany();
     if (!messages || (messages && messages.length === 0)) {
       return;

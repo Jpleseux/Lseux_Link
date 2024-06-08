@@ -1,6 +1,12 @@
+/* Estilos gerais para mensagens de erro e sucesso */
 .error,
 .success {
   position: fixed; /* Define a posição fixa */
+  top: 20px; /* Define a distância do topo */
+  left: 50%;
+  width: 50%;
+  margin-top: 8%;
+  transform: translateX(-90%); /* Centraliza horizontalmente */
   z-index: 9999;
   padding: 12px;
   display: flex;
@@ -9,6 +15,7 @@
   justify-content: start;
   border-radius: 8px;
   box-shadow: 0px 0px 5px -3px #111;
+  box-sizing: border-box; /* Inclui padding e border na largura total */
 }
 
 .error {
@@ -51,11 +58,14 @@
   fill: #fff; /* Preenchimento branco para ícones de fechar */
 }
 
+/* Estilos responsivos */
 @media (max-width: 768px) {
   .error,
   .success {
+    margin-top: 12%;
     width: calc(100% - 40px); /* Ajuste a largura conforme necessário */
     left: 20px; /* Define a distância da esquerda */
     right: 20px; /* Define a distância da direita */
+    transform: none; /* Remove a centralização horizontal */
   }
 }

@@ -38,8 +38,9 @@ export class ChatsController {
     });
   }
   @Get("/user/:query")
-  async SearchNewContacts(@Param("query") query: string, @Res() res) {
-    const users = await new searchNewContactsUsecase(this.messageRepo).execute(query);
+  async SearchNewContacts(@Param("query") query: string, @Res() res, @Req() req) {
+    const tokenDecoded = req["tokenPayload"];
+    const users = await new searchNewContactsUsecase(this.messageRepo).execute(query, tokenDecoded.uuid);
     res.status(HttpStatus.OK).send({
       users: users.map((user) => {
         return user.props;

@@ -38,4 +38,15 @@ export class NotificationEntity {
   setFrom(user: UserEntity) {
     this.props.from = user;
   }
+  toOutput(): object {
+    return {
+      uuid: this.Uuid(),
+      to: this.To().map((user) => user.props),
+      message: this.Message(),
+      type: this.Type(),
+      isReaded: this.IsReaded(),
+      isInvite: this.IsInvite(),
+      from: this.From() ? this.From().props : null,
+    };
+  }
 }

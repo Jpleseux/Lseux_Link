@@ -1,6 +1,7 @@
 .navbar-nav .nav-item .nav-link {
     display: flex;
     align-items: center;
+    position: relative; /* Added to position the badge correctly */
 }
 
 .navbar-nav .nav-item .nav-link .icon {
@@ -15,4 +16,19 @@
 
 .navbar-nav .nav-item .nav-link:hover {
     color: #007bff;
+}
+
+.navbar-nav .nav-item .badge {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

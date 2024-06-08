@@ -128,31 +128,28 @@ export class NotificationRepositoryTypeOrm implements NotificationRepositoryInte
     const notificationDb = await this.dataSource
       .getRepository(NotificationsModel)
       .createQueryBuilder("blog_notifications")
-      .where("blog_notifications.to @> :uuid", { uuid: JSON.stringify([to.uuid()]) })
-      .andWhere("blog_notifications.from = :uuid", { uuid: from.uuid() })
+      .where("blog_notifications.to @> :toUuid::jsonb", { toUuid: JSON.stringify([to.uuid()]) })
+      .andWhere("blog_notifications.from = :fromUuid", { fromUuid: from.uuid() })
       .andWhere("blog_notifications.is_invite = :invite", { invite: true })
+      .andWhere("blog_notifications.is_readed = :readed", { readed: false })
+
       .getOne();
     if (!notificationDb) {
       return;
     }
-    const notification = new NotificationEntity({
+    return new NotificationEntity({
       isInvite: notificationDb.is_invite,
       isReaded: notificationDb.is_readed,
       message: notificationDb.message,
       to: await Promise.all(
-        await notificationDb.to.map(async (uuid) => {
+        notificationDb.to.map(async (uuid) => {
           const user = await this.findUserByUuid(uuid);
-          if (!user) {
-            return;
-          } else {
-            return user;
-          }
+          return user;
         }),
       ),
       type: notificationDb.type as "system" | "personal" | "group",
       uuid: notificationDb.uuid,
       from: await this.findUserByUuid(notificationDb.from),
     });
-    return notification;
   }
 }

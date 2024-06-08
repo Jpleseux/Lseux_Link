@@ -6,9 +6,10 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { AuthModule } from "./http/nestjs/auth/auth.module";
 import { ProfileModule } from "./http/nestjs/profile/profile.module";
 import { PostsModule } from "./http/nestjs/posts/post.module";
-import { ChatsModule } from "./http/nestjs/chats/chats.module";
+import { ChatsModule } from "./http/nestjs/blogs/chats.module";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import { apiReference } from "@scalar/nestjs-api-reference";
+import { NotificationModule } from "./http/nestjs/notifications/notification.module";
 require("dotenv").config();
 
 async function bootstrap() {
@@ -30,10 +31,6 @@ async function bootstrap() {
     .setTitle("LseuxLink")
     .setDescription("Documentação LseuxLink")
     .setVersion("1.0")
-    .addTag("Auth")
-    .addTag("Profile")
-    .addTag("Posts")
-    .addTag("Chats")
     .build();
 
   swaggerConfig.security = [{ bearerAuth: [] }];
@@ -48,7 +45,7 @@ async function bootstrap() {
   };
 
   const swaggerDoc = SwaggerModule.createDocument(app, swaggerConfig, {
-    include: [ProfileModule, AuthModule, PostsModule, ChatsModule],
+    include: [ProfileModule, AuthModule, PostsModule, ChatsModule, NotificationModule],
   });
   app.use(
     "/doc",

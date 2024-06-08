@@ -7,10 +7,9 @@ export class ChatsSocketLocal implements ChatsSocketInterface {
   constructor(readonly server: SocketConnection) {}
 
   async sendMessage(input: MessageEntity): Promise<void> {
-    await this.server.send("send-porcent-mail-lote", input);
+    await this.server.send("send-message", input);
   }
-
-  async sendPorcentMailLote(input: any): Promise<void> {
-    await this.server.send("send-porcent-mail-lote", input);
+  async deleteMessage(uuid: string): Promise<void> {
+    await this.server.send("delete-message", uuid);
   }
 }

@@ -39,7 +39,6 @@ export class PostsController {
   @UseInterceptors(FilesInterceptor("images", 4, multerConfig))
   @Post()
   async savePost(@Res() res, @Req() req, @Body() body: any, @UploadedFiles() images: Express.Multer.File[]) {
-    console.log(req);
     const tokenDecoded = req["tokenPayload"];
 
     const action = new SavePostUsecase(this.repo, this.storage);

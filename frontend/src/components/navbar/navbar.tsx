@@ -2,10 +2,21 @@ import { IoPersonCircleOutline } from "react-icons/io5";
 import { Link } from "react-router-dom";
 import { FaHome } from 'react-icons/fa';
 import { MdContacts, MdGroups2 } from "react-icons/md";
-import { IoIosLogOut } from "react-icons/io";
+import { IoIosLogOut, IoIosNotifications } from "react-icons/io";
 import './style.css';
+import { useContext, useEffect, useState } from "react";
+import { GatewayContext } from "../../gateway/gatewayContext";
 
 function NavBar() {
+    const [notifications, setNotifications] = useState<number>(0);
+    const notificationGateway = useContext(GatewayContext)?.notificationGateway;
+    useEffect(() => {
+        getNotifications();
+    }, [])
+    async function getNotifications() {
+        const response = await notificationGateway?.getNotifications();
+        setNotifications(response?.notifications.length || 0);
+    }
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
             <div className="container-fluid">
@@ -33,6 +44,14 @@ function NavBar() {
                         <li className="nav-item me-4">
                             <Link className="nav-link" to="/grupos">
                                 <MdGroups2 className="icon" /> Grupos
+                            </Link>
+                        </li>
+                        <li className="nav-item me-4 position-relative">
+                            <Link  className="nav-link" to="/home/notifications">
+                                <IoIosNotifications className="icon" /> 
+                                {notifications > 0 && (
+                                    <span className="badge">{notifications}</span>
+                                )} Notificações
                             </Link>
                         </li>
                         <li className="nav-item me-4  ms-auto">
