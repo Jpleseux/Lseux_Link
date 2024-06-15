@@ -1,4 +1,4 @@
-import { UserEntity } from "./user.entity";
+import { UserEntity } from "@modules/chats/core/entity/user.entity";
 
 export type MessageProps = {
   uuid: string;
@@ -19,9 +19,6 @@ export class MessageEntity {
   }
   sender(): UserEntity {
     return this.props.sender;
-  }
-  sendByMe(uuid: string): boolean {
-    return this.sender().uuid() === uuid;
   }
   toOutput(): object {
     return { sender: this.sender().props, text: this.text(), chatUuid: this.chatUuid(), uuid: this.uuid() };

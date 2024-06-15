@@ -11,20 +11,27 @@ type chatInputProps = {
 export class SaveChatUsecase {
   constructor(readonly repo: ChatRepositoryInterface) {}
   public async execute(input: chatInputProps): Promise<ChatEntity> {
+    if (input.users.length < 2) {
+      throw new apiError(`O Chat deve ter pelo menos 2 usuarios`, 400, "INVALID");
+    }
     const user = await this.repo.findUserByUuid(input.userUuid);
+
+    const users = await Promise.all(
+      input.users.map(async (user) => {
+        const res = await this.repo.findUserByUuid(user);
+        if (!res) {
+          throw new apiError(`Usuario ${user} não foi encontrado`, 404, "not_found");
+        }
+        return res;
+      }),
+    );
+    users.push(user);
     const chat = new ChatEntity({
       name: input.name,
       type: input.type,
       uuid: randomUUID(),
-      users: [user],
+      users: users,
       messages: [],
-    });
-    input.users.map(async (user) => {
-      const res = await this.repo.findUserByUuid(user);
-      if (!res) {
-        throw new apiError(`Usuario ${user} não foi encontrado`, 404, "not_found");
-      }
-      chat.addUser(res);
     });
     await this.repo.save(chat);
     return chat;

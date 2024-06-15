@@ -1,3 +1,4 @@
+import { ContactEntity } from "./entities/contacts.entity";
 import { NotificationEntity } from "./entities/notification.entity";
 import { UserEntity } from "./entities/user.entity";
 
@@ -10,4 +11,6 @@ export interface NotificationRepositoryInterface {
   setNewUsers(notification: NotificationEntity): Promise<void>;
   findNotificationByUsers(to: UserEntity, from: UserEntity): Promise<NotificationEntity>;
   save(notification: NotificationEntity): Promise<void>;
+  findUnityContact(contact: ContactEntity): Promise<ContactEntity>;
+  getAmountNotificationsByUuid(uuid: string): Promise<number>;
 }

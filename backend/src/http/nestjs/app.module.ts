@@ -24,6 +24,7 @@ import { NotificationModule } from "./notifications/notification.module";
 import { NotificationsModel } from "@modules/notifications/infra/database/models/notification.model";
 import { NotificationUserModel } from "@modules/notifications/infra/database/models/UserModel.model";
 import { MessagesContactModel } from "@modules/messages/infra/database/models/contactModel.model";
+import { NotificationsContactsModel } from "@modules/notifications/infra/database/models/contactModel.model";
 @Global()
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { MessagesContactModel } from "@modules/messages/infra/database/models/co
         ContactsMessageModel,
         NotificationsModel,
         NotificationUserModel,
+        NotificationsContactsModel,
       ],
     }),
     RabbitMQModule.forRoot(RabbitMQModule, {

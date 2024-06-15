@@ -16,6 +16,9 @@ import NewPost from './pages/home/newPost.tsx'
 import Contacts from './pages/messages/contacts/contacts.tsx'
 import AddContact from './pages/messages/contacts/addContact.tsx'
 import Notifications from './pages/notifications/index.tsx'
+import BlockedContactsPage from './pages/messages/contacts/blocked.tsx'
+import IndexGroups from './pages/groups/index.tsx'
+import AddChat from './pages/groups/addChat.tsx'
 const router = createBrowserRouter([
   {
     path:"/",
@@ -62,6 +65,18 @@ const router = createBrowserRouter([
       {
         path: "notifications",
         element: <Notifications />
+      },
+      {
+        path: "contacts/blocked",
+        element: <BlockedContactsPage />
+      },
+      {
+        path: "chats",
+        element: <IndexGroups />
+      },
+      {
+        path: "chats/add",
+        element: <AddChat />
       }
     ]
   }

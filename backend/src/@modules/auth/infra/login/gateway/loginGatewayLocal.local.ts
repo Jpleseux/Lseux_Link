@@ -6,7 +6,7 @@ import { UserModel } from "../../database/models/UserModel.model";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import * as bcrypt from "bcrypt";
 import { UserEntity } from "@modules/auth/core/login/entities/user.entity";
-const segredo = "3cba50ad-324e-4f26-9bb9-3304bfc2c30e";
+const secret = "3cba50ad-324e-4f26-9bb9-3304bfc2c30e";
 
 export class LoginGatewayLocal implements LoginGatewayInterface {
   constructor(readonly datasorce: DataSource) {}
@@ -21,13 +21,13 @@ export class LoginGatewayLocal implements LoginGatewayInterface {
   }
 
   async tokenGenerate(user: UserEntity): Promise<string> {
-    const token = jwt.sign(user.payloadToken(), segredo);
+    const token = jwt.sign(user.payloadToken(), secret);
     return token;
   }
 
   async tokenDecoding(token: string): Promise<any> {
     try {
-      const payload = jwt.verify(token, segredo);
+      const payload = jwt.verify(token, secret);
       return payload;
     } catch (error) {
       throw new HttpException({ message: "Você não está autorizado" }, HttpStatus.UNAUTHORIZED);

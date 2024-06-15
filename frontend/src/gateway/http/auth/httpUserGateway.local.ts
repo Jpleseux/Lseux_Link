@@ -69,6 +69,7 @@ export class HttpUserGateway implements userGateway {
                 password: response.data.user.password,
                 token: response.data.token,
                 avatar: response.data.user.avatar,
+                uuid: response.data.user.uuid,
             })
             return {
                 token: response.data.token,

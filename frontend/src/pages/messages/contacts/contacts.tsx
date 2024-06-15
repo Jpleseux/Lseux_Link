@@ -8,7 +8,7 @@ import Message from "../../../components/visual/Message.component";
 import { io, Socket } from 'socket.io-client';
 import { MessageEntity } from "../../../entities/contacts/messageEntity.entity";
 import { UserEntity } from "../../../entities/contacts/user.entity";
-import ConfirmationDialog from "../../../components/confirmDialog/confirmDialog"; // Importa o componente de diálogo
+import ConfirmationDialog from "../../../components/confirmDialog/confirmDialog";
 
 const SOCKET_SERVER_URL = 'http://localhost:4000';
 
@@ -16,7 +16,8 @@ function Contacts() {
     const [contacts, setContacts] = useState<ContactEntity[]>([]);
     const [selectedContact, setSelectedContact] = useState<ContactEntity | null>(null);
     const [isDialogVisible, setIsDialogVisible] = useState(false);
-    const [messageToDelete, setMessageToDelete] = useState<string | null>(null); // Estado para armazenar o ID da mensagem a ser deletada
+    const [isAbleBlock, setIsAbleBlock] = useState<boolean>(false);
+    const [messageToDelete, setMessageToDelete] = useState<string | null>(null);
     const [newMessage, setNewMessage] = useState("");
     const [socket, setSocket] = useState<Socket | null>(null);
     const [search, setSearch] = useState("");
@@ -37,7 +38,7 @@ function Contacts() {
 
     async function handleContactClick(contact: ContactEntity) {
         setNewMessage("");
-        setSelectedContact(() => contact);
+        setSelectedContact(contact);
         setInitialLoad(true);
         scrollToBottom(false);
     }
@@ -110,6 +111,18 @@ function Contacts() {
             });
         };
 
+        const handleBlockContact = (contactUuid: string) => {
+            setContacts(prevContacts => prevContacts.filter(contact => contact.uuid() !== contactUuid));
+
+            setSelectedContact(prevSelectedContact => {
+                if (prevSelectedContact && prevSelectedContact.uuid() === contactUuid) {
+                    return null;
+                }
+                return prevSelectedContact;
+            });
+        };
+
+        socket.on('block-contact', handleBlockContact);
         socket.on('delete-message', handleDeleteMessage);
         socket.on('send-message', handleMessage);
 
@@ -117,6 +130,7 @@ function Contacts() {
             if (socket) {
                 socket.off('send-message', handleMessage);
                 socket.off('delete-message', handleDeleteMessage);
+                socket.off('block-contact', handleBlockContact);
             }
         };
     }, [socket, selectedContact]);
@@ -150,14 +164,12 @@ function Contacts() {
     };
 
     const sendMessage = async () => {
-        setLoading(true);
         setMsg({ msg: null, status: null });
         if (selectedContact) {
             const response = await messagesGateway?.sendMessage(newMessage, selectedContact.uuid());
             setMsg({ msg: response?.message, status: response?.status });
         }
         setNewMessage("");
-        setLoading(false);
         scrollToBottom();
     };
 
@@ -195,6 +207,19 @@ function Contacts() {
         return firstUserName.includes(search.toLowerCase()) || secondUserName.includes(search.toLowerCase());
     });
 
+    async function BlockUser() {
+        setMsg({ msg: null, status: null });
+        if (selectedContact) {
+            const data = await contactsGateway?.blockUser(selectedContact.uuid());
+            setMsg({ msg: data?.message, status: data?.status });
+        }
+        setIsAbleBlock(false);
+    }
+
+    async function cancelBlockUser() {
+        setIsAbleBlock(false);
+    }
+
     return (
         <>
             {msg.msg && <Message msg={msg.msg} status={msg.status} timers={3000} />}
@@ -205,33 +230,41 @@ function Contacts() {
                     onCancel={cancelDeleteMessage}
                 />
             )}
-            <div className="container groups">
-                <div className="content-wrapper">
-                    <div className="row gutters">
-                        <div className="col-12">
-                            <div className="card m-0">
-                                <div className="row no-gutters">
-                                    <div className="col-xl-4 col-lg-4 col-md-4 col-sm-12">
-                                        <div className="users-container">
-                                            <div className="text-center m-4">
-                                                <Link to={`/home/contacts/add`}>
-                                                    <button type="button" className="btn btn-info add-btn">
-                                                        <IoMdPersonAdd className="icon" />
-                                                        <span className="add-text">Adicionar</span>
-                                                    </button>
-                                                </Link>
-                                            </div>
-                                            <div className="chat-search-box">
-                                                <div className="input-group">
-                                                    <input className="form-control" placeholder="Search" onChange={HandleOnChangeSearch} value={search} />
-                                                    <div className="input-group-btn">
-                                                        <button type="button" className="btn btn-info">
-                                                            <i className="fa fa-search">Procurar</i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <ul className="users">
+            {isAbleBlock && (
+                <ConfirmationDialog
+                    message="Você tem certeza que quer bloquear esse usuario?"
+                    onConfirm={BlockUser}
+                    onCancel={cancelBlockUser}
+                />
+            )}
+        <div className="container-fluid">
+            <div className="row">
+                <div className="col-md-4">
+                    <div className="card">
+                        <div className="users-container-contacts">
+                            <div className="d-flex flex-wrap justify-content-center mb-4 m-2">
+                                <Link to={`/home/contacts/add`} className="me-2 mb-2 mb-md-0">
+                                    <button type="button" className="btn btn-info add-btn d-flex align-items-center justify-content-center">
+                                        <IoMdPersonAdd className="icon me-2" />
+                                        <span className="add-text">Adicionar</span>
+                                    </button>
+                                </Link>
+                                <Link to={`/home/contacts/blocked`} className="mb-2 mb-md-0">
+                                    <button type="button" className="btn btn-danger block-btn d-flex align-items-center justify-content-center">
+                                        Contatos Bloqueados
+                                    </button>
+                                </Link>
+                            </div>
+
+                            <div className="chat-search-box">
+                                <div className="input-group">
+                                    <input className="form-control" placeholder="Procurar" onChange={HandleOnChangeSearch} value={search} />
+                                    <div className="input-group-btn">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <ul className="users">
                                                 {!loading && filteredContacts && filteredContacts.length > 0 && filteredContacts.map((contact, index) => (
                                                     <li
                                                         className={`person ${selectedContact === contact ? 'active' : ''}`}
@@ -254,57 +287,65 @@ function Contacts() {
                                             </ul>
                                         </div>
                                     </div>
-                                    <div className="col-xl-8 col-lg-8 col-md-8 col-sm-12">
+                                </div>
+                                    <div className="col-md-8">
                                         {selectedContact ? (
                                             <div className="selected-user">
-                                                <span>To: <span className="name">{selectedContact.firstUser().uuid() === uuid ? selectedContact.secondUser().userName() : selectedContact.firstUser().userName()}</span></span>
+                                                <span>To: <span className="name">
+                                                    {selectedContact.firstUser().uuid() === uuid 
+                                                        ? selectedContact.secondUser().userName() 
+                                                        : selectedContact.firstUser().userName()}
+                                                </span></span>
+                                                <button className="cancel-button" type="button" onClick={() => setIsAbleBlock(true)}>Bloquear</button>
                                             </div>
+    
                                         ) : (
                                             <div className="selected-user">
                                                 <span>Selecione algum contato</span>
                                             </div>
                                         )}
                                         <div className="chat-container">
-                                            {selectedContact ? (
-                                                <ul className="chat-box chatContainerScroll">
-                                                    {selectedContact.messages().map((message, index) => (
-                                                        <li key={index} className={message.sendByMe(uuid) ? "chat-right m-4" : "chat-left m-4"}>
-                                                            {message.sendByMe(uuid) ?
-                                                                <>
-                                                                    <div className="chat-text">{message.text()}</div>
-                                                                    <div className="chat-avatar">
-                                                                        <img src={message.sender().avatar()} alt="Retail Admin" className="m-2" />
-                                                                        <div className="chat-name">{message.sender().userName()}</div>
-                                                                        {message.sender().uuid() === uuid && (
-                                                                            <span className="delete-message" onClick={() => {
-                                                                                setIsDialogVisible(true);
-                                                                                setMessageToDelete(message.uuid()); // Define a mensagem a ser deletada
-                                                                            }}>Apagar</span>
-                                                                        )}
-                                                                    </div>
-                                                                </>
-                                                                :
-                                                                <>
-                                                                    <div className="chat-avatar">
-                                                                        <img src={message.sender().avatar()} alt="Retail Admin" />
-                                                                        <div className="chat-name">{message.sender().userName()}</div>
-                                                                        {message.sender().uuid() === uuid && (
-                                                                            <span className="delete-message" onClick={() => {
-                                                                                setIsDialogVisible(true);
-                                                                                setMessageToDelete(message.uuid()); // Define a mensagem a ser deletada
-                                                                            }}>Apagar</span>
-                                                                        )}
-                                                                    </div>
-                                                                    <div className="chat-text">{message.text()}</div>
-                                                                </>
-                                                            }
-                                                        </li>
-                                                    ))}
-                                                    <div ref={messagesEndRef} />
-                                                </ul>
-                                            ) : (
-                                                <div className="no-chat-selected">Nenhum contato selecionado</div>
-                                            )}
+                                        {selectedContact ? (
+                                            <ul className="chat-box chatContainerScroll">
+                                                {selectedContact.messages().map((message, index) => (
+                                                    <li key={index} className={message.sendByMe(uuid) ? "chat-right m-4" : "chat-left m-4"}>
+                                                        {message.sendByMe(uuid) ?
+                                                            <>
+                                                                <div className="chat-text">{message.text()}</div>
+                                                                <div className="chat-avatar">
+                                                                    <img src={message.sender().avatar()} alt="Retail Admin" className="m-2" />
+                                                                    <div className="chat-name">{message.sender().userName()}</div>
+                                                                    {message.sender().uuid() === uuid && (
+                                                                        <span className="delete-message" onClick={() => {
+                                                                            setIsDialogVisible(true);
+                                                                            setMessageToDelete(message.uuid());
+                                                                        }}>Apagar</span>
+                                                                    )}
+                                                                </div>
+                                                            </>
+                                                            :
+                                                            <>
+                                                                <div className="chat-avatar">
+                                                                    <img src={message.sender().avatar()} alt="Retail Admin" />
+                                                                    <div className="chat-name">{message.sender().userName()}</div>
+                                                                    {message.sender().uuid() === uuid && (
+                                                                        <span className="delete-message" onClick={() => {
+                                                                            setIsDialogVisible(true);
+                                                                            setMessageToDelete(message.uuid());
+                                                                        }}>Apagar</span>
+                                                                    )}
+                                                                </div>
+                                                                <div className="chat-text">{message.text()}</div>
+                                                            </>
+                                                        }
+                                                    </li>
+                                                ))}
+                                                <div ref={messagesEndRef} />
+                                            </ul>
+                                        ) : (
+                                            <div className="no-chat-selected">Nenhum contato selecionado</div>
+                                        )}
+
                                             {selectedContact && (
                                                 <div className="form-group mt-3 mb-0">
                                                     <textarea
@@ -322,14 +363,24 @@ function Contacts() {
                                             )}
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
+            {isDialogVisible && (
+                <ConfirmationDialog
+                    message="Você tem certeza que quer deletar esta mensagem?"
+                    onConfirm={confirmDeleteMessage}
+                    onCancel={cancelDeleteMessage}
+                />
+            )}
+            {isAbleBlock && (
+                <ConfirmationDialog
+                    message="Você tem certeza que quer bloquear esse usuário?"
+                    onConfirm={BlockUser}
+                    onCancel={cancelBlockUser}
+                />
+            )}
+        </div>
         </>
-    );
+    );    
 }
 
 export default Contacts;

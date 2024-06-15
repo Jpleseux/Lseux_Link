@@ -5,6 +5,8 @@ import { AuthorizationMiddleware } from "../middlewares/autorization.middleware"
 import { middlewareGateway } from "@modules/shared/infra/gateway/middleware.gateway";
 import { NotificationController } from "./notification.controller";
 import { NotificationRepositoryTypeOrm } from "@modules/notifications/infra/orm/notificationRepository.typeOrm";
+import { NotificationsSocketLocal } from "@modules/notifications/infra/socket/NotificationsSocket.local";
+import { SocketConnection } from "@modules/shared/socket/socketConnection";
 
 @Module({
   controllers: [NotificationController],
@@ -15,6 +17,13 @@ import { NotificationRepositoryTypeOrm } from "@modules/notifications/infra/orm/
         return new middlewareGateway(dataSource);
       },
       inject: [getDataSourceToken()],
+    },
+    {
+      provide: NotificationsSocketLocal,
+      useFactory: (connection: SocketConnection) => {
+        return new NotificationsSocketLocal(connection);
+      },
+      inject: [SocketConnection],
     },
     {
       provide: NotificationRepositoryTypeOrm,

@@ -10,7 +10,8 @@ export class MessagesContactModel {
   updated_at?: Date;
   @DeleteDateColumn()
   deleted_at?: Date;
-
+  @Column({ default: false })
+  blocked?: boolean;
   @Column()
   first_user: string;
   @Column()

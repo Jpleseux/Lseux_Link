@@ -40,15 +40,22 @@ export class ContactsRepositoryTypeOrm implements ContactsRepositoryInterface {
       ])
       .execute();
   }
-  async disconnect(uuid: string): Promise<void> {
+  async disconnect(uuid: string, userUuid: string): Promise<void> {
     await this.DeleteContactsMessages(uuid);
-    await this.dataSource.createQueryBuilder().delete().from(ContactsModel).where("uuid = :uuid", { uuid: uuid }).execute();
+    await this.dataSource
+      .getRepository(ContactsModel)
+      .createQueryBuilder()
+      .update(ContactsModel)
+      .set({ blocked: true, blocked_by: userUuid })
+      .where("uuid = :uuid", { uuid: uuid })
+      .execute();
   }
   async findContactByUuid(uuid: string): Promise<ContactEntity> {
     const contact = await this.dataSource
       .getRepository(ContactsModel)
       .createQueryBuilder()
       .where("uuid = :uuid", { uuid: uuid })
+      .andWhere("blocked = :blocked", { blocked: false })
       .getOne();
     if (!contact) {
       return;
@@ -57,6 +64,27 @@ export class ContactsRepositoryTypeOrm implements ContactsRepositoryInterface {
       firstUser: await this.findUserByUuid(contact.first_user),
       secondUser: await this.findUserByUuid(contact.second_user),
       uuid: contact.uuid,
+      blockedBy: contact.blocked_by,
+      blocked: contact.blocked,
+      messages: await this.FindMessagesByChat(contact.uuid),
+    });
+  }
+  async findBlockedContactByUuid(uuid: string): Promise<ContactEntity> {
+    const contact = await this.dataSource
+      .getRepository(ContactsModel)
+      .createQueryBuilder()
+      .where("uuid = :uuid", { uuid: uuid })
+      .andWhere("blocked = :blocked", { blocked: true })
+      .getOne();
+    if (!contact) {
+      return;
+    }
+    return new ContactEntity({
+      firstUser: await this.findUserByUuid(contact.first_user),
+      secondUser: await this.findUserByUuid(contact.second_user),
+      uuid: contact.uuid,
+      blockedBy: contact.blocked_by,
+      blocked: contact.blocked,
       messages: await this.FindMessagesByChat(contact.uuid),
     });
   }
@@ -64,8 +92,8 @@ export class ContactsRepositoryTypeOrm implements ContactsRepositoryInterface {
     const contacts = await this.dataSource
       .getRepository(ContactsModel)
       .createQueryBuilder()
-      .where("first_user = :uuid", { uuid: user.uuid() })
-      .orWhere("second_user = :uuid", { uuid: user.uuid() })
+      .where("(first_user = :uuid OR second_user = :uuid)", { uuid: user.uuid() })
+      .andWhere("blocked = :blocked", { blocked: false })
       .getMany();
     if (!contacts || (contacts && contacts.length === 0)) {
       return [];
@@ -126,7 +154,42 @@ export class ContactsRepositoryTypeOrm implements ContactsRepositoryInterface {
       firstUser: await this.findUserByUuid(contactDb.first_user),
       secondUser: await this.findUserByUuid(contactDb.second_user),
       uuid: contactDb.uuid,
+      blockedBy: contactDb.blocked_by,
+      blocked: contactDb.blocked,
       messages: await this.FindMessagesByChat(contactDb.uuid),
     });
+  }
+  async findBlockedContacts(uuid: string): Promise<ContactEntity[]> {
+    const contacts = await this.dataSource
+      .getRepository(ContactsModel)
+      .createQueryBuilder()
+      .where("(first_user = :uuid OR second_user = :uuid)", { uuid: uuid })
+      .andWhere("blocked = :blocked", { blocked: true })
+      .andWhere("blocked_by = :uuid", { uuid: uuid })
+      .getMany();
+    if (!contacts || (contacts && contacts.length === 0)) {
+      return [];
+    }
+    return await Promise.all(
+      await contacts.map(async (contact) => {
+        return new ContactEntity({
+          firstUser: await this.findUserByUuid(contact.first_user),
+          secondUser: await this.findUserByUuid(contact.second_user),
+          uuid: contact.uuid,
+          blockedBy: contact.blocked_by,
+          blocked: contact.blocked,
+          messages: await this.FindMessagesByChat(contact.uuid),
+        });
+      }),
+    );
+  }
+  async reconnectUser(uuid: string): Promise<void> {
+    await this.dataSource
+      .getRepository(ContactsModel)
+      .createQueryBuilder()
+      .update(ContactsModel)
+      .set({ blocked: false })
+      .where("uuid = :uuid", { uuid: uuid })
+      .execute();
   }
 }

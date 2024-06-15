@@ -6,6 +6,7 @@ export type contactProps = {
   firstUser: UserEntity;
   secondUser: UserEntity;
   messages?: MessageEntity[];
+  blocked?: boolean;
 };
 export class ContactEntity {
   constructor(private readonly props: contactProps) {}

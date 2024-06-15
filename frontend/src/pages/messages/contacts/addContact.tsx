@@ -1,6 +1,6 @@
-import React, { useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { GatewayContext } from "../../../gateway/gatewayContext";
-import "../../../../public/style/chats/contacts.css";
+import "../../../../public/style/chats/contacts.css"; // Importe o novo CSS com os nomes alterados
 import UserCard from "../../../components/userCards/usercard";
 import { UserEntity } from "../../../entities/chats/user.entity";
 import ReactLoading from 'react-loading';
@@ -35,7 +35,7 @@ function AddContact() {
     };
 
     return (
-        <div className="container-fluid full-screen-container">
+        <div className="container-fluid full-screen-container" style={{ marginTop: "3%" }}>
             <div className="content-wrapper full-screen-content">
                 <div className="row justify-content-center align-items-center full-height">
                     <div className="col-12">
@@ -64,7 +64,7 @@ function AddContact() {
                                     </div>
                                     <div className="user-card-container p-4">
                                         {users && users.length > 0 && loading !== true && users.map((user, index) => (
-                                            <UserCard 
+                                            <UserCard
                                                 key={index}
                                                 name={user.userName()}
                                                 photo={user.avatar()}
@@ -74,7 +74,7 @@ function AddContact() {
                                         }
                                         {loading === true &&
                                             <div className="col-sm-12 d-flex justify-content-center align-items-center m-4">
-                                                <ReactLoading type="spin" height={"20%"} width={ "30%" } className="" color="gray"/>
+                                                <ReactLoading type="spin" height={"20%"} width={"30%"} className="" color="gray" />
                                             </div>
                                         }
                                     </div>
@@ -87,6 +87,5 @@ function AddContact() {
         </div>
     );
 }
-
 
 export default AddContact;

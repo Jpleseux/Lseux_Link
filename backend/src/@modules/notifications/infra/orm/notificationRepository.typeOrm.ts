@@ -4,6 +4,8 @@ import { NotificationUserModel } from "../database/models/UserModel.model";
 import { DataSource } from "typeorm";
 import { NotificationEntity } from "@modules/notifications/core/entities/notification.entity";
 import { NotificationsModel } from "../database/models/notification.model";
+import { ContactEntity } from "@modules/notifications/core/entities/contacts.entity";
+import { NotificationsContactsModel } from "../database/models/contactModel.model";
 
 export class NotificationRepositoryTypeOrm implements NotificationRepositoryInterface {
   constructor(readonly dataSource: DataSource) {}
@@ -19,7 +21,7 @@ export class NotificationRepositoryTypeOrm implements NotificationRepositoryInte
     return new UserEntity({
       userName: userDb.userName,
       uuid: userDb.uuid,
-      avatar: userDb.avatar,
+      avatar: `${process.env.STORAGE_BASE_URL}${userDb.avatar}`,
     });
   }
   async save(notification: NotificationEntity): Promise<void> {
@@ -43,9 +45,13 @@ export class NotificationRepositoryTypeOrm implements NotificationRepositoryInte
       .execute();
   }
   async findNotificationsByUserUuid(uuid: string): Promise<NotificationEntity[]> {
-    const data = await this.dataSource.query(`select * from blog_notifications where blog_notifications.to @> $1`, [
-      JSON.stringify([uuid]),
-    ]);
+    const data = await this.dataSource.query(
+      `
+      select * from blog_notifications 
+      where blog_notifications.to @> $1 
+      and is_readed = $2`,
+      [JSON.stringify([uuid]), true],
+    );
     if (!data || (data && data.length === 0)) {
       return [];
     }
@@ -74,6 +80,19 @@ export class NotificationRepositoryTypeOrm implements NotificationRepositoryInte
     }
     return notifications;
   }
+  async getAmountNotificationsByUuid(uuid: string): Promise<number> {
+    const result = await this.dataSource.query(
+      `
+        select count(*) from blog_notifications 
+        where blog_notifications.to @> $1 
+        and is_readed = $2`,
+      [JSON.stringify([uuid]), false],
+    );
+    const count = result[0]?.count || 0;
+
+    return parseInt(count, 10);
+  }
+
   async setReadedNotifications(uuid: string): Promise<void> {
     await this.dataSource
       .getRepository(NotificationsModel)
@@ -132,7 +151,7 @@ export class NotificationRepositoryTypeOrm implements NotificationRepositoryInte
       .andWhere("blog_notifications.from = :fromUuid", { fromUuid: from.uuid() })
       .andWhere("blog_notifications.is_invite = :invite", { invite: true })
       .andWhere("blog_notifications.is_readed = :readed", { readed: false })
-
+      .andWhere("is_readed = :is_readed", { is_readed: false })
       .getOne();
     if (!notificationDb) {
       return;
@@ -150,6 +169,27 @@ export class NotificationRepositoryTypeOrm implements NotificationRepositoryInte
       type: notificationDb.type as "system" | "personal" | "group",
       uuid: notificationDb.uuid,
       from: await this.findUserByUuid(notificationDb.from),
+    });
+  }
+  async findUnityContact(contact: ContactEntity): Promise<ContactEntity> {
+    const contactDb = await this.dataSource
+      .getRepository(NotificationsContactsModel)
+      .createQueryBuilder()
+      .where("first_user = :uuid", { uuid: contact.firstUser().uuid() })
+      .orWhere("second_user = :uuid", { uuid: contact.secondUser().uuid() })
+      .orWhere("first_user = :uuid", { uuid: contact.secondUser().uuid() })
+      .orWhere("second_user = :uuid", { uuid: contact.firstUser().uuid() })
+      .andWhere("blocked = :blocked", { blocked: false })
+      .getOne();
+    if (!contactDb) {
+      return;
+    }
+    return new ContactEntity({
+      firstUser: await this.findUserByUuid(contactDb.first_user),
+      secondUser: await this.findUserByUuid(contactDb.second_user),
+      uuid: contactDb.uuid,
+      blocked: contactDb.blocked,
+      messages: [],
     });
   }
 }

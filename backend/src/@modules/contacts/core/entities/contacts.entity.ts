@@ -6,12 +6,20 @@ export type contactProps = {
   firstUser: UserEntity;
   secondUser: UserEntity;
   messages?: MessageEntity[];
+  blocked?: boolean;
+  blockedBy?: string;
 };
 export class ContactEntity {
   constructor(private readonly props: contactProps) {}
 
   uuid(): string {
     return this.props.uuid;
+  }
+  blocked(): boolean {
+    return this.props.blocked;
+  }
+  blockedBy(): string {
+    return this.props.blockedBy;
   }
 
   firstUser(): UserEntity {

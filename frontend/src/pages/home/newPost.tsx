@@ -1,4 +1,5 @@
 import { ChangeEvent, useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import '../../../public/style/main/newPost.css';
 import { PostEntity } from '../../entities/posts/postEntity.entity';
 import { GatewayContext } from '../../gateway/gatewayContext';
@@ -10,6 +11,7 @@ function NewPost() {
   const [images, setImages] = useState<File[]>([]);
   const [msg, setMsg] = useState({ msg: null, status: null });
 
+  const navigate = useNavigate();
   const gatewayContext = useContext(GatewayContext);
   const postsGateway = gatewayContext?.postsGateway;
 
@@ -62,26 +64,25 @@ function NewPost() {
   async function submit() {
     setMsg({ msg: null, status: null });
     if (!post.props) {
-      setMsg({msg: "Deve existir um titulo e texto válido", status: 400})
-    } else {  
+      setMsg({ msg: "Deve existir um titulo e texto válido", status: 400 });
+    } else {
       const formData = new FormData();
       formData.append('title', post.title() ?? null);
       formData.append('text', post.text() ?? null);
       images.forEach((image) => {
-        formData.append(`images`, image);
+        formData.append('images', image);
       });
       const response = await postsGateway?.save(formData);
-    
+
       setMsg({ msg: response?.message, status: response?.status });
-    
+
       if (response?.status < 300) {
         setTimeout(() => {
-          window.location.href = "/home/index";
+          navigate("/home/index");
         }, 3000);
       }
     }
   }
-  
 
   return (
     <div className="newpost">
@@ -96,7 +97,7 @@ function NewPost() {
         </div>
         <div className="input-post">
           <label className="input__label" htmlFor="description">Descrição</label>
-          <textarea onChange={handleOnChange} rows="5" className="input__field input__field--textarea" id="description" name="text" placeholder='Dê uma boa descrição para sua postagem para que todos saibam do que se trata.'></textarea>
+          <textarea onChange={handleOnChange} rows={5} className="input__field input__field--textarea" id="description" name="text" placeholder='Dê uma boa descrição para sua postagem para que todos saibam do que se trata.'></textarea>
         </div>
         <div className="input-post">
           <div className="post_image">
@@ -108,12 +109,12 @@ function NewPost() {
               multiple
               onChange={handleOnImage} />
             <div className="preview">
-            {imagePreviews.map((image, index) => (
+              {imagePreviews.map((image, index) => (
                 <div key={index} className="image-preview">
-                    <img src={image} alt={`Image ${index}`} />
-                    <button onClick={() => removeImage(index)}>Excluir</button>
+                  <img src={image} alt={`Image ${index}`} />
+                  <button onClick={() => removeImage(index)}>Excluir</button>
                 </div>
-            ))}
+              ))}
             </div>
           </div>
         </div>

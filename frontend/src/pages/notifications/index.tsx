@@ -15,7 +15,11 @@ function Notifications() {
 
     useEffect(() => {
         getNotifications();
+        setReadedNotifications();
     }, [])
+    async function setReadedNotifications() {
+        await notificationGateway?.setReadedNotifications();
+    }
     async function getNotifications() {
         setLoading(true);
         const response = await notificationGateway?.getNotifications();

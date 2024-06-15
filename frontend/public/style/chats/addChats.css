@@ -1,0 +1,47 @@
+.add-chat-container {
+    margin: 0 auto;
+    margin-top: 2%;
+    width: 90%;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.add-chat-container h2 {
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.search-results ul,
+.selected-users ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.search-results li,
+.selected-users li {
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+.search-results li:hover,
+.selected-users li button:hover {
+    background-color: #f0f0f0;
+}
+
+.selected-users li button {
+    margin-left: 10px;
+    background-color: #ff4c4c;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}

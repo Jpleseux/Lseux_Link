@@ -132,6 +132,7 @@ export class MessagesRepositoryTypeOrm implements MessagesRepositoryInterface {
       .getRepository(MessagesContactModel)
       .createQueryBuilder()
       .where("uuid = :uuid", { uuid: uuid })
+      .andWhere("blocked = :blocked", { blocked: false })
       .getOne();
     if (!contact) {
       return;

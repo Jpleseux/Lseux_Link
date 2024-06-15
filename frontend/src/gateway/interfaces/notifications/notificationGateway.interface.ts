@@ -4,6 +4,11 @@ export type notificationOutput = {
     message: string;
     status:  number;
 }
+export type notificationOutputAmount = {
+    message: string;
+    status:  number;
+    amount: number;
+}
 export type notificationOutputMany = {
     message: string;
     status:  number;
@@ -19,5 +24,7 @@ export type saveNotificationInput = {
 export interface NotificationGatewayInterface {
     saveNotification(notification: saveNotificationInput): Promise<notificationOutput>;
     getNotifications(): Promise<notificationOutputMany>;
+    getAmountNotifications(): Promise<notificationOutputAmount>;
     deleteNotifications(uuid: string): Promise<notificationOutput>;
+    setReadedNotifications(): Promise<notificationOutput>;
 }

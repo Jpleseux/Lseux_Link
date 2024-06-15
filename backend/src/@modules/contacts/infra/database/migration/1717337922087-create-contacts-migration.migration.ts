@@ -33,6 +33,16 @@ export class CreateContactsMigration1717337922087 implements MigrationInterface 
             type: "uuid",
           },
           {
+            name: "blocked",
+            type: "boolean",
+            default: false,
+          },
+          {
+            name: "blocked_by",
+            type: "uuid",
+            isNullable: true,
+          },
+          {
             name: "second_user",
             type: "uuid",
           },

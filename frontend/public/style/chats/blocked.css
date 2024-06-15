@@ -1,0 +1,80 @@
+.blocked-users-container {
+    background-color: #f9f9f9;
+    padding: 2rem; /* Use rem para tamanhos relativos */
+    border-radius: 0.5rem; /* Unidades rem para arredondamento */
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1); /* Ajuste a sombra */
+    max-width: 100%;
+    margin: 0 auto; /* Centralizar para telas grandes */
+}
+
+.blocked-users-header {
+    text-align: center;
+    margin-bottom: 1.25rem; /* Use rem para espaçamento */
+}
+
+.blocked-users-header h2 {
+    color: #333;
+    font-size: 1.5rem; /* Ajuste de tamanho de fonte */
+}
+
+.blocked-users-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* Espaçamento entre os itens */
+}
+
+.blocked-user {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.625rem; /* Use rem para tamanhos relativos */
+    border-bottom: 1px solid #ccc;
+    flex-wrap: wrap; /* Permitir quebra de linha em telas menores */
+}
+
+.blocked-user:last-child {
+    border-bottom: none;
+}
+
+.unblock-button {
+    background-color: #ff4c4c;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem; /* Use rem para tamanhos relativos */
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-size: 1rem; /* Ajuste de tamanho de fonte */
+}
+
+.unblock-button:hover {
+    background-color: #ff2c2c;
+}
+
+/* Media Queries para Responsividade */
+@media (max-width: 768px) {
+    .blocked-users-container {
+        padding: 1rem; /* Reduzir o padding em telas menores */
+    }
+
+    .blocked-user {
+        flex-direction: column; /* Empilhar os itens verticalmente */
+        align-items: flex-start; /* Alinhar ao início para consistência */
+    }
+
+    .unblock-button {
+        font-size: 10px;
+        align-self: center; /* Alinhar botão à direita em colunas */
+        margin-top: 0.5rem; /* Espaçamento superior para o botão */
+        width: 50%;
+    }
+}
+
+@media (max-width: 480px) {
+    .blocked-users-header h2 {
+        font-size: 1.25rem; /* Ajustar tamanho da fonte para telas menores */
+    }
+
+    .unblock-button {
+        padding: 0.375rem 0.75rem; /* Ajuste de padding para telas menores */
+    }
+}

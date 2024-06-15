@@ -12,6 +12,7 @@ import { AddUserToChatUsecase } from "@modules/chats/core/usecase/addUserToChat.
 import { AddNewChatUserInputRequestDto } from "./dto/addNewUserChat.request.dto";
 import { searchNewContactsUsecase } from "@modules/messages/core/usecase/searchNewContacts.usecase";
 import { MessagesRepositoryTypeOrm } from "@modules/messages/infra/orm/messagesRepository.typeOrm";
+import { ExitFromChatUsecase } from "@modules/chats/core/usecase/ExitFromChat.usecase";
 
 @ApiTags("Chats")
 @Controller("chats")
@@ -68,11 +69,20 @@ export class ChatsController {
   }
 
   @Patch()
-  async addNewChatUser(@Param("uuid") uuid: string, @Body() body: AddNewChatUserInputRequestDto, @Req() req, @Res() res) {
+  async addNewChatUser(@Body() body: AddNewChatUserInputRequestDto, @Req() req, @Res() res) {
     const tokenDecoded = req["tokenPayload"];
     const chat = await new AddUserToChatUsecase(this.repo).execute(tokenDecoded.uuid, body.userUuid, body.chatUuid);
     res.status(HttpStatus.OK).send({
       message: "Usuario adicionado com sucesso",
+      chat: chat.toOutput(),
+    });
+  }
+  @Patch("/:uuid")
+  async ExitNewChatUser(@Param("uuid") uuid: string, @Body() body: AddNewChatUserInputRequestDto, @Req() req, @Res() res) {
+    const tokenDecoded = req["tokenPayload"];
+    const chat = await new ExitFromChatUsecase(this.repo).execute(tokenDecoded.uuid, uuid);
+    res.status(HttpStatus.OK).send({
+      message: "Usuario removido com sucesso",
       chat: chat.toOutput(),
     });
   }

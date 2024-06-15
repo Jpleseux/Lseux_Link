@@ -11,6 +11,7 @@ import { MessagesRepositoryTypeOrm } from "@modules/messages/infra/orm/messagesR
 import { MessagesController } from "./messages/message.controller";
 import { ContactsRepositoryTypeOrm } from "@modules/contacts/infra/orm/contactsRepository.typeOrm";
 import { ContactsController } from "./contacts/contacts.controller";
+import { contactsSocketLocal } from "@modules/contacts/infra/socket/ContactsSocket.local";
 
 @Module({
   controllers: [ChatsController, MessagesController, ContactsController],
@@ -33,6 +34,13 @@ import { ContactsController } from "./contacts/contacts.controller";
       provide: ChatsSocketLocal,
       useFactory: (connection: SocketConnection) => {
         return new ChatsSocketLocal(connection);
+      },
+      inject: [SocketConnection],
+    },
+    {
+      provide: contactsSocketLocal,
+      useFactory: (connection: SocketConnection) => {
+        return new contactsSocketLocal(connection);
       },
       inject: [SocketConnection],
     },

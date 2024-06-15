@@ -101,7 +101,7 @@ export class ChatRepositoryTypeOrm implements ChatRepositoryInterface {
       .orderBy("created_at")
       .getMany();
     if (!messages || (messages && messages.length === 0)) {
-      return;
+      return [];
     }
     return await Promise.all(
       messages.map(async (message) => {

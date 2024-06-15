@@ -42,15 +42,15 @@ function UserCard({ name, photo, uuid }) {
         setMsg({msg: response?.message, status: response?.status});
     }
     return (
-        <div className="user-card">
+        <div className="user-card-new">
             {msg.msg && <Message msg={msg.msg} status={msg.status} timers={3000} />}
-            <img src={photo} alt={`${name}'s photo`} className="user-photo" />
-            <div className="user-info">
-                <h6 className="user-name">{name}</h6>
+            <img src={photo} alt={`${name}'s photo`} className="user-photo-new" />
+            <div className="user-info-new">
+                <h6 className="user-name-new">{name}</h6>
             </div>
-            <button type="button" className="btn btn-info add-btn" onClick={saveInviteNotification}>
-                <IoMdPersonAdd className="icon" />
-                <span className="add-text">Adicionar</span>
+            <button type="button" className="btn btn-info add-btn-new" onClick={saveInviteNotification}>
+                <IoMdPersonAdd className="icon-new" />
+                <span className="add-text-new">Adicionar</span>
             </button>
         </div>
     );

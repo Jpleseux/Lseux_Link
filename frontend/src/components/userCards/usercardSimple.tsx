@@ -1,9 +1,9 @@
 function UserCardSimple({ name, photo }) {
     return (
-        <div className="user-card">
-            <img src={photo} alt={`${name}'s photo`} className="user-photo" />
-            <div className="user-info">
-                <h6 className="user-name">{name}</h6>
+        <div className="user-card-new">
+            <img src={photo} alt={`${name}'s photo`} className="user-photo-new" />
+            <div className="user-info-new">
+                <h6 className="user-name-new">{name}</h6>
             </div>
         </div>
     );

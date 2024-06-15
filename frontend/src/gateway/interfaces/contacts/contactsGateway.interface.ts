@@ -12,4 +12,7 @@ export type contactsOutputMany = {
 export interface ContactsGatewayInterface {
     saveContact(userUuid: string): Promise<contactsOutput>;
     getContacts(): Promise<contactsOutputMany>;
+    blockUser(uuid: string): Promise<contactsOutput>;
+    findBlockedContacts(): Promise<contactsOutputMany>;
+    unblockContact(uuid: string): Promise<contactsOutput>;
 }
