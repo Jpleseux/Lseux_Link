@@ -4,7 +4,7 @@ import { UserEntity } from "@modules/auth/core/register/entities/user.entity";
 import * as jwt from "jsonwebtoken";
 import { RegisterGatewayInterface } from "@modules/auth/core/register/registerGateway.interface";
 import { apiError } from "../../../../../http/nestjs/helpers/api-Error.helper";
-const segredo = "3cba50ad-324e-4f26-9bb9-3304bfc2c30e";
+const segredo = "any scret";
 export class RegisterGatewayLocal implements RegisterGatewayInterface {
   constructor(readonly datasorce: DataSource) {}
   async validateEmail(email: string): Promise<string | boolean> {

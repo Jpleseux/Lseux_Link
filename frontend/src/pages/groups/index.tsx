@@ -170,9 +170,6 @@ function IndexGroups() {
         setIsDialogVisible(false);
         setMessageToDelete(null);
     };
-    const deleteChat = () => {
-        
-    }
     useEffect(() => {
         if (selectedGroup) {
             scrollToBottom(initialLoad ? false : true);
@@ -194,7 +191,7 @@ function IndexGroups() {
                     onCancel={cancelDeleteMessage}
                 />
             )}
-            <div className="container groups">
+            <div className="container chats-container">
                 <div className="content-wrapper">
                     <div className="row gutters">
                         <div className="col-12">
